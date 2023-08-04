@@ -14,8 +14,6 @@ app.use(logger);
 
 
 //<application 설정한 후 외부에 개방>
-
-
 app.use("/", globalRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);
