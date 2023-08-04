@@ -7,23 +7,34 @@ const app = express();
 
 //logger함수는 middleware를 return해줌
 const logger = morgan("dev")
+app.use(logger);
 
 
 //<application 설정한 후 외부에 개방>
 
 
-const home = (req,res) => {
-    console.log("I will respond");
-    return res.send("hello")
-};
+const globalRouter = express.Router();
+const handleHome = (req, res) => res.send("Home");
 
-const login = (req,res) => {
-    return res.send("login")
-};
+globalRouter.get("/", handleHome);
 
-app.use(logger) 
-app.get("/", home);
-app.get("/login", login);
+const userRouter = express.Router();
+
+const handleEditUser = (req, res) => res.send("Edit User");
+
+userRouter.get("/edit", handleEditUser);
+
+const videoRouter = express.Router();
+
+const handleWatchVideo = (req, res) => res.send("Watch Video");
+
+videoRouter.get("/watch", handleWatchVideo);
+
+app.use("/", globalRouter);
+app.use("/videos", videoRouter);
+app.use("/users", userRouter);
+
+
 
 
 
