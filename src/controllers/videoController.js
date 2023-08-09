@@ -4,7 +4,7 @@ let videos = [
     rating: 5,
     comments: 2,
     createdAt: "2 minutes ago",
-    views: 59,
+    views: 1,
     id: 1,
   },
   {
@@ -31,10 +31,15 @@ let videos = [
 export const trending = (req, res) => {
   return res.render("home", { pageTitle: "Home", videos });
 };
-export const see = (req, res) => {
+export const watch = (req, res) => {
+  // videoRouter.get("/:id(\\d+)", see);에서 id얻음
+  // const id = req.params.id;
   const { id } = req.params;
+  // id를 이용해서 비디오를 찾을거임
+  // 배열은 0부터 시작하므로 id-1
   const video = videos[id - 1];
-  return res.render("watch", { pageTitle: `Watching ${video.title}` });
+  // watch라는 템플릿을 render해줌
+  return res.render("watch", { pageTitle: `Watching ${video.title}`, video });
 };
 export const edit = (req, res) => res.render("edit");
 
