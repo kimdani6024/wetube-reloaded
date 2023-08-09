@@ -2,11 +2,6 @@ extends base.pug
 
 block content
     h3 #{video.views} #{video.views === 1 ? "view" : "views"}
-    //- url을 videos/1/eidt으로 이동하고 싶음
-    	========> a(href="potato")
-        http://localhost:4000/videos/potato
-        ========> a(href="/potato")
-        http://localhost:4000/potato
     a(href=`${video.id}/edit`) Edit video &rarr; 
 
     
