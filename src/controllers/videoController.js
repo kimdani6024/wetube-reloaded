@@ -51,8 +51,33 @@ export const getEdit = (req, res) => {
 };
 
 export const postEdit = (req, res) => {
-  const { id } = req.params;
-  const { title } = req.body;
+  //어느 비디오를 수정중인지 알아야하니까
+  //video route로부터 id를 얻어와서 /video/id페이지로 redirect(자동이동)시켜줌
+  const { id } = req.params; // = const id = req.params.id
+  //req.body에는 form을 통해 submit된 데이터의 키-값 쌍을 포함
+  //form으로 부터 정보를 가져옴 edit.pug의 name"title"을 따옴
+  //console.log(req.body)
+  const { title } = req.body; // = const title = req.body.title
+  //비디오 업데이트해줌. 가짜 database사용하고 있어서 별로 중요한건 아님
   videos[id - 1].title = title;
+  //자동으로 이동
   return res.redirect(`/videos/${id}`);
+};
+
+export const getUpload = (req, res) => {
+  return res.render("upload", { pageTitle: "Upload Video" });
+};
+
+export const postUpload = (req, res) => {
+  const { title } = req.body;
+  const newVideo = {
+    title,
+    rating: 0,
+    comments: 0,
+    createdAt: "just now",
+    views: 0,
+    id: videos.length + 1,
+  };
+  videos.push(newVideo);
+  return res.redirect("/");
 };
