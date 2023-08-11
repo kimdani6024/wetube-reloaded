@@ -1,3 +1,4 @@
+import "./db";
 import express from "express";
 import morgan from "morgan";
 import globalRouter from "./routers/globalRouter";
@@ -33,5 +34,6 @@ app.use("/users", userRouter);
 
 
 //listen : 서버가 시작될 때 작동하는 함수
-const handleListening = () => console.log(`✅ Server listenting on port http://localhost:${PORT} 🚀`)
+const handleListening = () => 
+    console.log(`✅ Server listenting on http://localhost:${PORT} 🚀`);
 app.listen(PORT, handleListening)
