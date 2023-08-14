@@ -40,14 +40,23 @@ export const watch = async (req, res) => {  // videoRouter.get("/:id(\\d+)", see
   const { id } = req.params;
   //findById는 id로 영상을 찾아낼 수 있는 기능을 지원해줌
   const video = await Video.findById(id);
+  if (!video) {
+    return res.render("404", { pageTitle: "Video not found." });
+  }
   //watch.pug에 video 데이터 전송해주기 
   return res.render("watch", { pageTitle: video.title, video });
 };
 
-export const getEdit = (req, res) => {
+export const getEdit = async (req, res) => {
   //수정할 비디오 id를 찾아야함
   const { id } = req.params;
-  return res.render("edit", { pageTitle: `Editing` });
+  const video = await Video.findById(id);
+  //video가 존재하지 않는다면
+  if (!video) {
+    return res.render("404", { pageTitle: "Video not found." });
+  }
+  //video가 존재한다면
+  return res.render("edit", { pageTitle: `Edit: ${video.title}`, video });
 };
 
 export const postEdit = (req, res) => {
