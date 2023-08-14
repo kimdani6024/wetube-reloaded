@@ -65,6 +65,21 @@ export const getUpload = (req, res) => {
 };
 
 export const postUpload = (req, res) => {
-  const { title } = req.body;
+  //video.js참고
+  const { title, description, hashtags } = req.body;
+  //왼쪽 title 등은 schema의 것
+  const video = new Video({
+    title: title,
+    description: description,
+    createdAt: Date.now(),
+    //split을 사용하면 배열이 됌. 간단한 문장에서 배열 만들기 > split사용
+    //array를 만들어 단어별 분리를 시킨 다음 #을 붙여줌
+    hashtags: hashtags.split(",").map((word) => `#${word}`),
+    meta: {
+      views: 0,
+      rating: 0,
+    },
+  });
+  console.log(video);
   return res.redirect("/");
 };
