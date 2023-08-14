@@ -64,22 +64,24 @@ export const getUpload = (req, res) => {
   return res.render("upload", { pageTitle: "Upload Video" });
 };
 
-export const postUpload = (req, res) => {
+export const postUpload = async (req, res) => {
   //video.js참고
   const { title, description, hashtags } = req.body;
   //왼쪽 title 등은 schema의 것
-  const video = new Video({
-    title: title,
-    description: description,
-    createdAt: Date.now(),
-    //split을 사용하면 배열이 됌. 간단한 문장에서 배열 만들기 > split사용
-    //array를 만들어 단어별 분리를 시킨 다음 #을 붙여줌
-    hashtags: hashtags.split(",").map((word) => `#${word}`),
-    meta: {
-      views: 0,
-      rating: 0,
-    },
-  });
-  console.log(video);
-  return res.redirect("/");
+  //object를 만들고
+  try {
+    await Video.create({
+      title,
+      description,
+      hashtags: hashtags.split(",").map((word) => `#${word}`),
+    });
+    return res.redirect("/");
+  } catch (error) {
+    return res.render("upload", {
+      pageTitle: "Upload Video",
+      errorMessage: error._message,
+    });
+  }
 };
+
+
