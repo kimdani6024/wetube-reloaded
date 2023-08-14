@@ -27,6 +27,7 @@ export const home = async (req, res) => {
   //위에서 아래로 순서대로 출력해줌 
   //코드 실행 중 오류 발생시 아래코드 출력해줌 
   const videos = await Video.find({});
+  //render뒤에 redirect가 올때 유의해야함. 두 function중 하나만 옴. return을 적어서 실수를 방지하는 게 좋음
   return res.render("home", { pageTitle: "Home", videos });
 }
   catch {
