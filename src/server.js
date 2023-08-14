@@ -1,12 +1,9 @@
-import "./db";
-import "./models/Video";
 import express from "express";
 import morgan from "morgan";
 import globalRouter from "./routers/globalRouter";
 import videoRouter from "./routers/videoRouter";
 import userRouter from "./routers/userRouter";
 
-const PORT = 4000;
 
 //현재 작업 디렉토리
 // console.log(process.cwd())
@@ -33,8 +30,4 @@ app.use("/users", userRouter);
 
 
 
-
-//listen : 서버가 시작될 때 작동하는 함수
-const handleListening = () => 
-    console.log(`✅ Server listenting on http://localhost:${PORT} 🚀`);
-app.listen(PORT, handleListening)
+export default app;
