@@ -35,11 +35,13 @@ export const home = async (req, res) => {
   }
 };
 
-export const watch = (req, res) => {
-  // videoRouter.get("/:id(\\d+)", see);에서 id얻음
+export const watch = async (req, res) => {  // videoRouter.get("/:id(\\d+)", see);에서 id얻음
   // const id = req.params.id;
   const { id } = req.params;
-  return res.render("watch", { pageTitle: `Watching` });
+  //findById는 id로 영상을 찾아낼 수 있는 기능을 지원해줌
+  const video = await Video.findById(id);
+  //watch.pug에 video 데이터 전송해주기 
+  return res.render("watch", { pageTitle: video.title, video });
 };
 
 export const getEdit = (req, res) => {
@@ -84,5 +86,4 @@ export const postUpload = async (req, res) => {
     });
   }
 };
-
 
