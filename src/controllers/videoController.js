@@ -68,6 +68,7 @@ export const postUpload = async (req, res) => {
   //video.js참고
   const { title, description, hashtags } = req.body;
   //왼쪽 title 등은 schema의 것
+  //try는 video.js에서 required: true입력함으로써 생기는 에러를 잡기위해 사용
   //object를 만들고
   try {
     await Video.create({
