@@ -16,6 +16,18 @@ const videoSchema = new mongoose.Schema({
   },
 });
 
+//middleware는 무조건 model이 생성되기 전에 만들어야 함
+//middleware로 호출된 async function을 보냄
+videoSchema.pre("save", async function () {
+  //hashtags array에서 첫번째 element를 뽑음
+  //>"for","real","now"
+  //이렇게 하지 않으면 input에 입력된 값이 하나의 element로 array에 입력되기 떄문임 
+  //> "for,real,now"
+  this.hashtags = this.hashtags[0]
+    .split(",")
+    .map((word) => (word.startsWith("#") ? word : `#${word}`));
+});
+
 // model이름+ 데이터형태인 schema로 구성
 const Video = mongoose.model("Video", videoSchema);
 export default Video;
