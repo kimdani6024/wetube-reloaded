@@ -59,15 +59,34 @@ export const getEdit = async (req, res) => {
   return res.render("edit", { pageTitle: `Edit: ${video.title}`, video });
 };
 
-export const postEdit = (req, res) => {
+export const postEdit = async (req, res) => {
   //어느 비디오를 수정중인지 알아야하니까
   //video route로부터 id를 얻어와서 /video/id페이지로 redirect(자동이동)시켜줌
   const { id } = req.params; // = const id = req.params.id
   //req.body에는 form을 통해 submit된 데이터의 키-값 쌍을 포함
   //form으로 부터 정보를 가져옴 edit.pug의 name"title"을 따옴
   //console.log(req.body)
-  const { title } = req.body; // = const title = req.body.title
-
+  // = const title = req.body.title
+  const { title, description, hashtags } = req.body;
+  //영상을 검색
+  const video = await Video.exists({ _id: id });
+  //영상 존재하는지 확인, 없다면 404 렌더
+  if (!video) {
+    return res.render("404", { pageTitle: "Video not found." });
+  }
+  //영상 정보 업데이트
+  //두개의 인자가 필요, 1 : 업데이트 하고 하자는 영상의 id, 2 : 업데이트할 정보 혹은 내용
+  await Video.findByIdAndUpdate(id, {
+    title,
+    description,
+    hashtags: hashtags
+      //split(",")로 array로 변환
+      .split(",")
+      //해시태그들이 뭐로 시작하는지 확인
+      .map((word) => (word.startsWith("#") ? word : `#${word}`)),
+  });
+  await video.save();
+  //videoRouter.route("/:id([0-9a-f]{24})/edit").get(getEdit).post(postEdit);
   return res.redirect(`/videos/${id}`);
 };
 
@@ -85,7 +104,9 @@ export const postUpload = async (req, res) => {
     await Video.create({
       title,
       description,
-      hashtags: hashtags.split(",").map((word) => `#${word}`),
+      hashtags: hashtags
+        .split(",")
+        .map((word) => (word.startsWith("#") ? word : `#${word}`)),
     });
     return res.redirect("/");
   } catch (error) {
