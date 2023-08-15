@@ -26,7 +26,8 @@ export const home = async (req, res) => {
   try {
   //위에서 아래로 순서대로 출력해줌 
   //코드 실행 중 오류 발생시 아래코드 출력해줌 
-  const videos = await Video.find({});
+  //desc : 내림차순
+  const videos = await Video.find({}).sort({ createdAt: "desc" });
   //render뒤에 redirect가 올때 유의해야함. 두 function중 하나만 옴. return을 적어서 실수를 방지하는 게 좋음
   return res.render("home", { pageTitle: "Home", videos });
 }
@@ -122,3 +123,27 @@ export const deleteVideo = async (req, res) => {
   return res.redirect("/");
 };
 
+export const search = async (req, res) => {
+  //검색할 keyword들을 req.query에서 볼 수 있음
+  //console.log(req.query) > {keyword: "python"}으로 검색됨됨
+  //라우터로 지정한 :id -> req.params
+  // pug파일에서 input으로 받은 내용 -> req.body(form이 POST일 때)
+  // pug파일에서 input으로 받은 url내용 -> req.query (form이 GET일 때)
+  const { keyword } = req.query;
+  //keyword가 없다면 비어있지만 있다면 videos array는 업데이트 될 것 > let
+  let videos = [];
+  if (keyword) {
+    //video를 찾는다
+    videos = await Video.find({
+      title: {
+        //$regex는 정규표현식의 약자 > keyword로 시작하는 단어만 검색하고 싶다면 $를 맨앞에
+        //i는 대문자와 소문자를 구분하지 않는 역할
+        //MongoDB 필터 엔진
+        //https://docs.mongodb.com/manual/reference/operator/query/regex/
+        $regex: new RegExp(`${keyword}$`, "i"),
+      },
+    });
+  }
+  //serch.pug가 base.pug를 기본으로 하고 있어서 꼭 pagetitle을 써줘야함
+  return res.render("search", { pageTitle: "Search", videos });
+};
