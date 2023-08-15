@@ -50,6 +50,8 @@ export const watch = async (req, res) => {  // videoRouter.get("/:id(\\d+)", see
 export const getEdit = async (req, res) => {
   //수정할 비디오 id를 찾아야함
   const { id } = req.params;
+  //video object가 꼭 필요함. 
+  //object를 edit template(return res.render("edit", { pageTitle: `Edit: ${video.title}`, video });)로 보내줘야해서
   const video = await Video.findById(id);
   //video가 존재하지 않는다면
   if (!video) {
@@ -60,6 +62,7 @@ export const getEdit = async (req, res) => {
 };
 
 export const postEdit = async (req, res) => {
+  //video object가 필요없음 단순히 영상이 존재하는지만 확인하면 됌
   //어느 비디오를 수정중인지 알아야하니까
   //video route로부터 id를 얻어와서 /video/id페이지로 redirect(자동이동)시켜줌
   const { id } = req.params; // = const id = req.params.id
@@ -69,6 +72,7 @@ export const postEdit = async (req, res) => {
   // = const title = req.body.title
   const { title, description, hashtags } = req.body;
   //영상을 검색
+  //https://mongoosejs.com/docs/api/model.html#Model.exists() 
   const video = await Video.exists({ _id: id });
   //영상 존재하는지 확인, 없다면 404 렌더
   if (!video) {
