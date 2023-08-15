@@ -83,11 +83,7 @@ export const postEdit = async (req, res) => {
   await Video.findByIdAndUpdate(id, {
     title,
     description,
-    hashtags: hashtags
-      //split(",")로 array로 변환
-      .split(",")
-      //해시태그들이 뭐로 시작하는지 확인
-      .map((word) => (word.startsWith("#") ? word : `#${word}`)),
+    hashtags: Video.formatHashtags(hashtags),
   });
   await video.save();
   //videoRouter.route("/:id([0-9a-f]{24})/edit").get(getEdit).post(postEdit);
@@ -108,7 +104,7 @@ export const postUpload = async (req, res) => {
     await Video.create({
       title,
       description,
-      hashtags,
+      hashtags: Video.formatHashtags(hashtags),
     });
     return res.redirect("/");
   } catch (error) {

@@ -16,17 +16,23 @@ const videoSchema = new mongoose.Schema({
   },
 });
 
+// export const formatHashtags = (hashtags) =>
+//   hashtags.split(",").map((word) => (word.startsWith("#") ? word : `#${word}`));
+// 부를 때 formatHashtags(hashtags)
+
 //middleware는 무조건 model이 생성되기 전에 만들어야 함
-//middleware로 호출된 async function을 보냄
-videoSchema.pre("save", async function () {
+//우리가 만든 function > static
+//static : schema.static, 만들고자하는 static의 이름, function 필요함
+videoSchema.static("formatHashtags", function (hashtags) {
   //hashtags array에서 첫번째 element를 뽑음
   //>"for","real","now"
   //이렇게 하지 않으면 input에 입력된 값이 하나의 element로 array에 입력되기 떄문임 
   //> "for,real,now"
-  this.hashtags = this.hashtags[0]
+  return hashtags
     .split(",")
     .map((word) => (word.startsWith("#") ? word : `#${word}`));
 });
+
 
 // model이름+ 데이터형태인 schema로 구성
 const Video = mongoose.model("Video", videoSchema);
