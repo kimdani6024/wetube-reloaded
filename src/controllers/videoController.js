@@ -56,7 +56,7 @@ export const getEdit = async (req, res) => {
   const video = await Video.findById(id);
   //video가 존재하지 않는다면
   if (!video) {
-    return res.render("404", { pageTitle: "Video not found." });
+    return res.status(404).render("404", { pageTitle: "Video not found." });
   }
   //video가 존재한다면
   return res.render("edit", { pageTitle: `Edit: ${video.title}`, video });
@@ -77,7 +77,7 @@ export const postEdit = async (req, res) => {
   const video = await Video.exists({ _id: id });
   //영상 존재하는지 확인, 없다면 404 렌더
   if (!video) {
-    return res.render("404", { pageTitle: "Video not found." });
+    return res.status(404).render("404", { pageTitle: "Video not found." });
   }
   //영상 정보 업데이트
   //두개의 인자가 필요, 1 : 업데이트 하고 하자는 영상의 id, 2 : 업데이트할 정보 혹은 내용
@@ -109,7 +109,7 @@ export const postUpload = async (req, res) => {
     });
     return res.redirect("/");
   } catch (error) {
-    return res.render("upload", {
+    return res.status(400).render("upload", {
       pageTitle: "Upload Video",
       errorMessage: error._message,
     });
