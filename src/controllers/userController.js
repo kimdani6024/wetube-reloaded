@@ -43,7 +43,7 @@ export const postJoin = async (req, res) => {
       }
   };
 
-  export const getLogin = (req, res) =>
+export const getLogin = (req, res) =>
   res.render("login", { pageTitle: "Login" });
 
 export const postLogin = async (req, res) => {
@@ -51,6 +51,7 @@ export const postLogin = async (req, res) => {
   //계정이 존재하는지 체크
   //받은 username과 일치하는 user가 있는지 확인
   const pageTitle = "Login";
+  //req.body에서 가져온 username을 가지는 user를 찾음
   const user = await User.findOne({ username });
   if (!user) {
     return res.status(400).render("login", {
@@ -62,6 +63,7 @@ export const postLogin = async (req, res) => {
   //입력한 패스워드를 해싱하고, 그 값이 db에 있는 해시값과 같은지 비교
   // 패스워드를 알지 못해도 일치하는지 알수있음
   //bcrypt.compare(유저가 form에 입력한 패스워드, db에 있는 해시값)
+  //const user = await User.findOne({ username });이용 
   const ok = await bcrypt.compare(password, user.password);
   //내가입력한 password가 해시값 password와 같지않으면
   if (!ok) {
