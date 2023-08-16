@@ -3,6 +3,8 @@ extends base
 
 block content
     form(method="POST")
+        //- name이 없다면 백엔드에서 쓸수없음 필.수임
+        //- userSchema에서 씀
         input(name="name", type="text", required, placeholder="name")
         input(name="email", type="email", required, placeholder="email")
         input(name="username", type="text", required, placeholder="username")
