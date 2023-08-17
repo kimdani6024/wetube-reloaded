@@ -50,11 +50,7 @@ app.use((req, res, next) => {
     });
   });
 
-//백엔드가 쿠키를 가지고 브라우저를 구분하는 방법
-app.get("/add-one", (req, res, next) => {
-    req.session.potato += 1;
-    return res.send(`${req.session.id} ${req.session.potato}`);
-  });
+
 
 app.use("/", rootRouter);
 app.use("/videos", videoRouter);
