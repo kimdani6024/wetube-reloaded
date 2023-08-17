@@ -4,7 +4,7 @@ import session from "express-session";
 import rootRouter from "./routers/rootRouter";
 import videoRouter from "./routers/videoRouter";
 import userRouter from "./routers/userRouter";
-
+import {localsMiddleware} from "./middlewares";
 
 //현재 작업 디렉토리
 // console.log(process.cwd())
@@ -51,7 +51,8 @@ app.use((req, res, next) => {
   });
 
 
-
+//middleware는 session 다음에 와야함
+app.use(localsMiddleware);
 app.use("/", rootRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);

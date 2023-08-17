@@ -72,7 +72,10 @@ export const postLogin = async (req, res) => {
       errorMessage: "Wrong password",
     });
   }
+  //유저가 로그인하면 유저정보를 세션에 담아야함
+  //req.session object에 정보를 저장하고 있음. 유저가 로그인에 성공했는지 안했는지는 상관없음
   req.session.loggedIn = true;
+  //db에서 찾은 user
   req.session.user = user;
   return res.redirect("/");
 };
