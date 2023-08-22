@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import session from "express-session";
+import MongoStore from "connect-mongo";
 import rootRouter from "./routers/rootRouter";
 import videoRouter from "./routers/videoRouter";
 import userRouter from "./routers/userRouter";
@@ -32,23 +33,17 @@ app.use(express.urlencoded({ extended: true }));
 // 서버는 세션을 브라우저에게 줘
 // 브라우저는 쿠키에 세션을 보관해
 // 후에 재방문시 세션을 보여주면 자동으로 로그인
+// 쿠키 : 백엔드가 브라우저에게 주는 정보
 app.use(
     session({
       secret: "Hello!",
       resave: true,
       saveUninitialized: true,
+      // 세션들 mongodb database에 저장
+      store: MongoStore.create({ mongoUrl: "mongodb://127.0.0.1:27017/wetube-reloaded" }),
     })
   );
 
-//백엔드가 브라우저에게 세션id를 보냄
-//cookies가 세션을 확인
-app.use((req, res, next) => {
-    req.sessionStore.all((error, sessions) => {
-    //백엔드에 등록된 세션이 console.log됌
-      console.log(sessions);
-      next();
-    });
-  });
 
 
 //middleware는 session 다음에 와야함
