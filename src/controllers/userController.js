@@ -227,20 +227,47 @@ export const getEdit = (req, res) => {
 };
 
 export const postEdit = async (req, res) => {
+  // const {user:{id}} = req.session; == const id = req.session.user.id 
+  // const {name, email, username, location} = req.body;
   const {
-    session: {
-      user: { _id },
+    // req.session.user에서 현재 로그인된 아이디 얻기
+    session: { 
+      user: { _id }, 
     },
+    // edit-profile.pug에서 오는거임
     body: { name, email, username, location },
   } = req;
-  await User.findByIdAndUpdate(_id, {
-    name,
-    email,
-    username,
-    location,
-  });
-  return res.render("edit-profile");
+  // username이나 email은 업데이트하지 못하게 막아야함
+ 
+  // user를 찾아서 업데이트 해줘야함
+  // findByIdAndUpdate가 updatedUser를 주기때문에 req.session.user = updatedUser;를 해주면 됌됌
+  // findByIdAndUpdate는 기본적으로 업데이트 되기전의 데이터를 return해줌
+  try {
+    const updatedUser = await User.findByIdAndUpdate(_id,
+      {
+        name,
+        email,
+        username,
+        location,
+      },
+      // new: true해주면 findByIdAndUpdate가 업데이트된 데이터를 return해줌
+      // moongose에게 가장 최근 업데이트된 object를 원한다고 하는것
+      { new: true }
+    );
+    req.session.user = updatedUser;
+    return res.redirect("/users/edit");
+  } 
+  // username, email은 user.js에서 unique: true임 
+  catch (error) {
+    return res
+      .status(400)
+      .render("edit-profile", {
+        pageTitle: "Edit Profile",
+        errorMessage: "This username/email is already taken",
+      });
+  }
 };
 
 
-  export const see = (req, res) => res.send("See User");0
+
+  export const see = (req, res) => res.send("See User");
