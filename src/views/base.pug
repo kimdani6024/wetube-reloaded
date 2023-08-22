@@ -13,6 +13,8 @@ html(lang="ko")
                     //- pug파일에서 locals에 접근할 수 있음. 로그인 된 상태
                     //- middlewares.js에서 옴 loggedIn이 session에 user가 있는지 확인해야함
                     if loggedIn
+                        li
+                            a(href="/videos/upload") Upload Video
                         li 
                             a(href="/users/edit") Edit Profile
                         li 
@@ -30,8 +32,7 @@ html(lang="ko")
 
                     li
                         a(href="/search") Search
-                    li
-                        a(href="/videos/upload") Upload Video
+
                         
         main
             block content
