@@ -93,6 +93,7 @@ export const startGithubLogin = (req, res) => {
   const config = {
     client_id: process.env.GH_CLIENT,
     allow_signup: false,
+    // read:user을 했기때문에 user의 정보를 읽을 수 있는 access_token을 받을 수 있음
     scope: "read:user user:email",
   };
   // 노션 설명 참조
@@ -105,6 +106,7 @@ export const startGithubLogin = (req, res) => {
 
 export const finishGithubLogin = async (req, res) => {
   // https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#2-users-are-redirected-back-to-your-site-by-github
+  // 깃헙이 준 코드를 가지고 access_token으로 교환을 함
   const baseUrl = "https://github.com/login/oauth/access_token";
   // https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps
   const config = {
@@ -134,13 +136,15 @@ export const finishGithubLogin = async (req, res) => {
     })
   ).json();
 
+  // access_token은 깃허브 API URL를 fetch하는데 사용
+  // access_token은 user가 모든걸 할 수 있게 해주진 않음.
+  // scope에서 read:user을 했기때문에 user의 정보를 읽을 수 있는 access_token을 받을 수 있음
+  // 깃헙 API를 이용해서 user 정보를 가져옴
   if ("access_token" in tokenRequest) {
     const { access_token } = tokenRequest;
-      // access_token을 이용해 github api로 간다.
-      // 깃헙 API를 이용해서 user 정보를 가져옴
-      const apiUrl = "https://api.github.com";
-      const userData = await (
-        await fetch(`${apiUrl}/user`, {
+    const apiUrl = "https://api.github.com";
+    const userData = await (
+      await fetch(`${apiUrl}/user`, {
         // HTTP headers는 는 클라이언트와 서버가 request(or response)로 부가적인 정보를 전송할 수 있도록 해줌
         headers: {
           // https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
@@ -150,8 +154,9 @@ export const finishGithubLogin = async (req, res) => {
         },
       })
     ).json();
-
     console.log(userData);
+
+  // https://docs.github.com/en/rest/reference/users#add-an-email-address-for-the-authenticated-user
     const emailData = await (
       await fetch(`${apiUrl}/user/emails`, {
         headers: {
@@ -159,6 +164,8 @@ export const finishGithubLogin = async (req, res) => {
         },
       })
     ).json();
+
+    // email은 배열 > primary랑 verified가 모두 true인 email 찾음
     const email = emailData.find(
       (email) => email.primary === true && email.verified === true
     );
