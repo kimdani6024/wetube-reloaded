@@ -53,7 +53,7 @@ export const postLogin = async (req, res) => {
   //받은 username과 일치하는 user가 있는지 확인
   const pageTitle = "Login";
   //req.body에서 가져온 username을 가지는 user를 찾음
-  const user = await User.findOne({ username });
+  const user = await User.findOne({ username, socialOnly: false });
   if (!user) {
     return res.status(400).render("login", {
         pageTitle,
@@ -166,11 +166,33 @@ export const finishGithubLogin = async (req, res) => {
     ).json();
 
     // email은 배열 > primary랑 verified가 모두 true인 email 찾음
-    const email = emailData.find(
+    const emailObj = emailData.find(
       (email) => email.primary === true && email.verified === true
     );
-    if (!email) {
+    if (!emailObj) {
       return res.redirect("/login");
+    }
+
+    // 깃헙 프로필의 email이 데이터베이스에 있을때 유저가 로그인 할 수 있게 해줌.
+    let user = await User.findOne({ email: emailObj.email });
+    // DB에 깃헙 email을 가진 user가 없다면, 새로운 계정을 만들어서 user를 로그인시킴
+    if (!user) {
+      // 깃허브데이터로 user를 생성
+      user = await User.create({
+        // 프로필사진
+        // avatarUrl이 없는 user는 email과 password로만 계정을 만들었단 소리
+        avatarUrl: userData.avatar_url,
+        name: userData.name,
+        username: userData.login,
+        email: emailObj.email,
+        password: "",
+        // 해당 계정은 깃허브로 만들어졌고, password가 없다는 뜻
+        socialOnly: true,
+        location: userData.location,
+      });
+      req.session.loggedIn = true;
+      req.session.user = user;
+      return res.redirect("/");
     }
 
   } else {
@@ -178,9 +200,12 @@ export const finishGithubLogin = async (req, res) => {
   }
 };
 
+export const logout = (req, res) => {
+  // 세션을 없앤다
+  req.session.destroy();
+  return res.redirect("/");
+};
 
 export const edit = (req, res) => res.send("Edit User");
-export const remove = (req, res) => res.send("Remove User");
 
-export const logout = (req, res) => res.send("Log out");
 export const see = (req, res) => res.send("See User");

@@ -13,7 +13,7 @@ html(lang="ko")
                     //- pug파일에서 locals에 접근할 수 있음. 로그인 된 상태
                     if loggedIn
                         li 
-                            a(href="/logout") Log Out 
+                            a(href="/users/logout")  Log Out
                         //- 로그인 되어 있다 > loggedInUser값이 있다
                         //- middleware.js : res.locals.loggedInUser = req.session.user;로 할당
                         li 
