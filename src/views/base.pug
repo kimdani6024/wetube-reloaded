@@ -11,13 +11,17 @@ html(lang="ko")
                     li
                         a(href="/") Home
                     //- pug파일에서 locals에 접근할 수 있음. 로그인 된 상태
+                    //- middlewares.js에서 옴 loggedIn이 session에 user가 있는지 확인해야함
                     if loggedIn
                         li 
+                            a(href="/users/edit") Edit Profile
+                        li 
                             a(href="/users/logout")  Log Out
+
                         //- 로그인 되어 있다 > loggedInUser값이 있다
                         //- middleware.js : res.locals.loggedInUser = req.session.user;로 할당
-                        li 
-                            a(href="/my-profile") #{loggedInUser.name}의 Profile
+                        //- li 
+                        //-     a(href="/my-profile") #{loggedInUser.name}의 Profile
                     else
                         li
                             a(href="/join")  Join

@@ -53,6 +53,7 @@ export const postLogin = async (req, res) => {
   //받은 username과 일치하는 user가 있는지 확인
   const pageTitle = "Login";
   //req.body에서 가져온 username을 가지는 user를 찾음
+  // socialOnly: false > username과 password로만 로그인 할 수 있는 유저
   const user = await User.findOne({ username, socialOnly: false });
   if (!user) {
     return res.status(400).render("login", {
@@ -103,7 +104,7 @@ export const startGithubLogin = (req, res) => {
   return res.redirect(finalUrl);
 };
 
-
+// 유저가 깃허브에서 돌아오면 URL에 ?code=xxxxx가 덧붙여진 내용을 받음
 export const finishGithubLogin = async (req, res) => {
   // https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#2-users-are-redirected-back-to-your-site-by-github
   // 깃헙이 준 코드를 가지고 access_token으로 교환을 함
@@ -116,8 +117,10 @@ export const finishGithubLogin = async (req, res) => {
     // 코드를 access_token으로 바꿈
     code: req.query.code,
   };
-  // 아래의 parameter를 가지고 POST request를 해봄
+  // 파라미터들을 URL의 파라미터 string으로 바꿔줌
   const params = new URLSearchParams(config).toString();
+  // baseUrl과 config를 더해서 다른 URL을 만듬
+  // 깃허브가 준 code가 담겨있음
   const finalUrl = `${baseUrl}?${params}`;
 
   // 1. fetch('url')로 다른 서버를 통해 데이터를 가져올 수있다. 하지만, res.body 에 담겨있는 날것의 url로는 제대로 된 객체를 받아올 수 없다.
@@ -126,6 +129,7 @@ export const finishGithubLogin = async (req, res) => {
   // ex){"coord":{"lon":139.01,"lat":35.02},"weather":[{"id":800,"main":"Clear","description":"clear sky","icon":"01n"}]
   const tokenRequest = await (
     await fetch(finalUrl, {
+      // final URL로 POST request를 보냄
       method: "POST",
       // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
       headers: {
@@ -136,28 +140,34 @@ export const finishGithubLogin = async (req, res) => {
     })
   ).json();
 
-  // access_token은 깃허브 API URL를 fetch하는데 사용
-  // access_token은 user가 모든걸 할 수 있게 해주진 않음.
+
+
+  // 모든것이 올바르다면, 깃허브는 우리에게 access_token을 줌
   // scope에서 read:user을 했기때문에 user의 정보를 읽을 수 있는 access_token을 받을 수 있음
+  // access_token은 깃허브 API와 상호작용할 때 씀
   // 깃헙 API를 이용해서 user 정보를 가져옴
   if ("access_token" in tokenRequest) {
     const { access_token } = tokenRequest;
     const apiUrl = "https://api.github.com";
     const userData = await (
+      // user 프로필을 받기위해 요청 > 그 요청은 ${apiUrl}/user로 감
+      
       await fetch(`${apiUrl}/user`, {
         // HTTP headers는 는 클라이언트와 서버가 request(or response)로 부가적인 정보를 전송할 수 있도록 해줌
         headers: {
           // https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
-          // Authorization
-          // 보호된 리소스에 대한 접근을 허용하여 서버로 User agent를 인증하는 자격증명을 보내는 역할을 합니다
+          // Authorization : 보호된 리소스에 대한 접근을 허용하여 서버로 User agent를 인증하는 자격증명을 보내는 역할
+          // access_token을 주면 user데이터를 받을 수 있음
           Authorization: `token ${access_token}`,
         },
       })
     ).json();
     console.log(userData);
 
+  // 때때로 email 정보를 안줄때도 있어서 email API에게도 요청을 보내줘야함
   // https://docs.github.com/en/rest/reference/users#add-an-email-address-for-the-authenticated-user
     const emailData = await (
+      // 위랑 똑같이 access_token으로 요청을 보내면
       await fetch(`${apiUrl}/user/emails`, {
         headers: {
           Authorization: `token ${access_token}`,
@@ -165,19 +175,20 @@ export const finishGithubLogin = async (req, res) => {
       })
     ).json();
 
-    // email은 배열 > primary랑 verified가 모두 true인 email 찾음
+    // email array를 줌 > primary랑 verified가 모두 true인 email 찾음
     const emailObj = emailData.find(
       (email) => email.primary === true && email.verified === true
     );
+    // 찾지 못한다면 로그인 페이지로 돌아감
     if (!emailObj) {
       return res.redirect("/login");
     }
 
-    // 깃헙 프로필의 email이 데이터베이스에 있을때 유저가 로그인 할 수 있게 해줌.
+    // primary랑 verified가 모두 true인 email 찾으면 데이터베이스에서 해당 email을 찾음
     let user = await User.findOne({ email: emailObj.email });
-    // DB에 깃헙 email을 가진 user가 없다면, 새로운 계정을 만들어서 user를 로그인시킴
+    // 깃헙 프로필의 email이 데이터베이스에 없을때, 그 email로 새로운 계정을 만들어서 user를 로그인시킴
     if (!user) {
-      // 깃허브데이터로 user를 생성
+      // 해당 email과 깃헙이 보낸 모든 데이터를 가지고 user를 만듬
       user = await User.create({
         // 프로필사진
         // avatarUrl이 없는 user는 email과 password로만 계정을 만들었단 소리
@@ -186,19 +197,23 @@ export const finishGithubLogin = async (req, res) => {
         username: userData.login,
         email: emailObj.email,
         password: "",
-        // 해당 계정은 깃허브로 만들어졌고, password가 없다는 뜻
+        // 해당 계정은 깃허브로 만들어졌고, password가 없다는 뜻 > 로그인 폼 사용불가
         socialOnly: true,
         location: userData.location,
       });
+    }
+      // 깃헙 프로필의 email이 데이터베이스에 있을때 > 유저가 로그인 할 수 있게 해줌
       req.session.loggedIn = true;
       req.session.user = user;
       return res.redirect("/");
-    }
 
   } else {
     return res.redirect("/login");
   }
 };
+// 위의 기능이 완료되면 쿠키가 생김
+
+// 네이버,카카오 rest api도 해보자!
 
 export const logout = (req, res) => {
   // 세션을 없앤다
@@ -206,6 +221,13 @@ export const logout = (req, res) => {
   return res.redirect("/");
 };
 
-export const edit = (req, res) => res.send("Edit User");
+
+export const getEdit = (req, res) => {
+  return res.render("edit-profile", { pageTitle: "Edit Profile" });
+};
+export const postEdit = (req, res) => {
+  return res.render("edit-profile");
+};
+
 
 export const see = (req, res) => res.send("See User");

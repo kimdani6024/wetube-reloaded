@@ -10,6 +10,7 @@ export const localsMiddleware = (req,res,next) => {
     res.locals.loggedIn = Boolean(req.session.loggedIn)
     res.locals.siteName="Wetube";
     //처음엔 로그인 되어있지 않아서 처음엔 undefiend
-    res.locals.loggedInUser = req.session.user;
+    //현재 로그인된 사용자를 알려줌
+    res.locals.loggedInUser = req.session.user || {};
     next();
 }
