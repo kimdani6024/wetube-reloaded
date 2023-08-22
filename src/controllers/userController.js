@@ -1,4 +1,5 @@
 import User from "../models/User";
+import fetch from "node-fetch";
 import bcrypt from "bcrypt";
 
 
@@ -82,6 +83,92 @@ export const postLogin = async (req, res) => {
   //db에서 찾은 user
   req.session.user = user;
   return res.redirect("/");
+};
+
+//  a(href="https://github.com/login/oauth/authorize?client_id=3d40761ba7a0edd8472d&allow_signup=false") Continue with Github &rarr;
+export const startGithubLogin = (req, res) => {
+  // https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
+  const baseUrl = "https://github.com/login/oauth/authorize";
+  // https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps
+  const config = {
+    client_id: process.env.GH_CLIENT,
+    allow_signup: false,
+    scope: "read:user user:email",
+  };
+  // 노션 설명 참조
+  const params = new URLSearchParams(config).toString();
+
+  const finalUrl = `${baseUrl}?${params}`;
+  return res.redirect(finalUrl);
+};
+
+
+export const finishGithubLogin = async (req, res) => {
+  // https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#2-users-are-redirected-back-to-your-site-by-github
+  const baseUrl = "https://github.com/login/oauth/access_token";
+  // https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps
+  const config = {
+    client_id: process.env.GH_CLIENT,
+    client_secret: process.env.GH_SECRET,
+    // https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#2-users-are-redirected-back-to-your-site-by-github
+    // 코드를 access_token으로 바꿈
+    code: req.query.code,
+  };
+  // 아래의 parameter를 가지고 POST request를 해봄
+  const params = new URLSearchParams(config).toString();
+  const finalUrl = `${baseUrl}?${params}`;
+
+  // 1. fetch('url')로 다른 서버를 통해 데이터를 가져올 수있다. 하지만, res.body 에 담겨있는 날것의 url로는 제대로 된 객체를 받아올 수 없다.
+  // 2.때문에 중간에 .json 함수가 response의 스트림을 가져와 끝까지 읽고, res.body의 텍스트를 promise의 형태로 반환한다.
+  // 3. 다른 서버에서 데이터를 object 형식으로 받아온다.
+  // ex){"coord":{"lon":139.01,"lat":35.02},"weather":[{"id":800,"main":"Clear","description":"clear sky","icon":"01n"}]
+  const tokenRequest = await (
+    await fetch(finalUrl, {
+      method: "POST",
+      // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
+      headers: {
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
+        // 돌려줄 데이터 타입에 대해 서버에게 알려주는 역할
+        Accept: "application/json",
+      },
+    })
+  ).json();
+
+  if ("access_token" in tokenRequest) {
+    const { access_token } = tokenRequest;
+      // access_token을 이용해 github api로 간다.
+      // 깃헙 API를 이용해서 user 정보를 가져옴
+      const apiUrl = "https://api.github.com";
+      const userData = await (
+        await fetch(`${apiUrl}/user`, {
+        // HTTP headers는 는 클라이언트와 서버가 request(or response)로 부가적인 정보를 전송할 수 있도록 해줌
+        headers: {
+          // https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
+          // Authorization
+          // 보호된 리소스에 대한 접근을 허용하여 서버로 User agent를 인증하는 자격증명을 보내는 역할을 합니다
+          Authorization: `token ${access_token}`,
+        },
+      })
+    ).json();
+
+    console.log(userData);
+    const emailData = await (
+      await fetch(`${apiUrl}/user/emails`, {
+        headers: {
+          Authorization: `token ${access_token}`,
+        },
+      })
+    ).json();
+    const email = emailData.find(
+      (email) => email.primary === true && email.verified === true
+    );
+    if (!email) {
+      return res.redirect("/login");
+    }
+
+  } else {
+    return res.redirect("/login");
+  }
 };
 
 

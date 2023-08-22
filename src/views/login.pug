@@ -8,6 +8,11 @@ block content
         input(placeholder="Username", name="username", type="text", required)
         input(placeholder="Password", name="password", type="password", required)
         input(type="submit", value="Login")
+        br
+        //- https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
+        //- allow_signup : 사용자가 깃헙계정이 없다면 계정 생성 하게할지, 이미 계정이있는 사람만 하게 할지 결정
+        //- allow_signup=false : 계정생성 불가능, 이미 깃헙 사용자인 경우에만 가능
+        a(href="/users/github/start") Continue with Github &rarr;
     hr
     div
         span Don't have an account? 

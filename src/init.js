@@ -1,3 +1,7 @@
+// package-lock을 참고하면 첫 애플리케이션은 init.js로 시작함
+// 필요한 모든 파일 윗 부분에 requre를 넣어야 하니까 init.js에 입력
+// require("dotenv").config();
+import "dotenv/config";
 import "./db";
 import "./models/Video";
 import "./models/User";

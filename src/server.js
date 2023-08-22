@@ -27,6 +27,8 @@ app.use(logger);
 //express가 form의 value들을 이해할 수 있도록 하고, 자바스크립트 형식으로 변형시켜줌
 app.use(express.urlencoded({ extended: true }));
 
+
+
 //session middleware -> router앞에 설정
 //사이트로 들어오는 모두를 기억하게 함
 // 브라우저가 서버에게 로그인을 요청해.
@@ -48,7 +50,7 @@ app.use(
       resave: false,
       saveUninitialized: false,
       // 세션들 mongodb database에 저장
-      store: MongoStore.create({ mongoUrl: process.env.DB_URL }),  
+      store: MongoStore.create({ mongoUrl: process.env.DB_URL}),  
     })
   );
 
