@@ -36,11 +36,19 @@ app.use(express.urlencoded({ extended: true }));
 // 쿠키 : 백엔드가 브라우저에게 주는 정보
 app.use(
     session({
-      secret: "Hello!",
-      resave: true,
-      saveUninitialized: true,
+      // 쿠키에 sign할때 사용하는 string
+      // 쿠키에 sing하는 이유 : 백엔드가 쿠키를 줬다는걸 보여주기 위함
+      secret: process.env.COOKIE_SECRET,
+      // 세션을 수정할때만 db에 저장하고 쿠키를 넘겨줌 > 우리는 로그인할때만 세션을 수정함
+      // 백엔드가 로그인한 사용자에게만 쿠키를 주도록 설정
+      // 기억하고 싶은사람들에게만 쿠키를 주고 있는데, 그게 바로 우리유저임
+      // (usercontroller.js참조)
+      // req.session.loggedIn = true;
+      // req.session.user = user;
+      resave: false,
+      saveUninitialized: false,
       // 세션들 mongodb database에 저장
-      store: MongoStore.create({ mongoUrl: "mongodb://127.0.0.1:27017/wetube-reloaded" }),
+      store: MongoStore.create({ mongoUrl: process.env.DB_URL }),  
     })
   );
 

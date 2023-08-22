@@ -72,6 +72,10 @@ export const postLogin = async (req, res) => {
       errorMessage: "Wrong password",
     });
   }
+
+  // 밑에 두줄이 우리가 실제로 세션을 초기화하는 부분
+  // 우리는 로그인할때만 세션을 수정함
+  
   //유저가 로그인하면 유저정보를 세션에 담아야함
   //req.session object에 정보를 저장하고 있음. 유저가 로그인에 성공했는지 안했는지는 상관없음
   req.session.loggedIn = true;

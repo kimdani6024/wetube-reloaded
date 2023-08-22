@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 //url뒤에 database 이름 적어주기
-mongoose.connect("mongodb://127.0.0.1:27017/wetube-reloaded", {
+mongoose.connect(process.env.DB_URL , {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
