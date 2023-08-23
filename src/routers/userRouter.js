@@ -12,7 +12,7 @@ import {
   import {
     protectorMiddleware,
     publicOnlyMiddleware,
-    uploadFiles,
+    avatarUpload,
   } from "../middlewares";
 
 
@@ -26,7 +26,7 @@ userRouter
   .all(protectorMiddleware)
   .get(getEdit)
   // input에서 오는 아바타 파일 한개만 업로드함
-  .post(uploadFiles.single("avatar"), postEdit);
+  .post(avatarUpload.single("avatar"), postEdit);
 userRouter
   .route("/change-password")
   .all(protectorMiddleware)

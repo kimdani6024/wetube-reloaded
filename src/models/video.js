@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 const videoSchema = new mongoose.Schema({
   //trim:공백을 없애줌
   title: { type: String, required: true, trim: true, maxLength: 80 },
+  fileUrl: { type: String, required: true },
   description: { type: String, required: true, trim: true, minLength: 20 },
   //default: Date.now는 즉각 실행하지만 mongoose가 내가 새로운 비디오를 생성했을 때만 실행시켜줌
   createdAt: { type: Date, required: true, default: Date.now },

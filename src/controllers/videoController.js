@@ -96,6 +96,9 @@ export const getUpload = (req, res) => {
 };
 
 export const postUpload = async (req, res) => {
+  // multer는 req.file을 제공해줌. file안에 path가 있음
+  // fileUrl만들어주기 > video.js에서
+  const { path: fileUrl } = req.file;
   //video.js참고
   const { title, description, hashtags } = req.body;
   //왼쪽 title 등은 schema의 것
@@ -105,10 +108,12 @@ export const postUpload = async (req, res) => {
     await Video.create({
       title,
       description,
+      fileUrl,
       hashtags: Video.formatHashtags(hashtags),
     });
     return res.redirect("/");
   } catch (error) {
+    console.log(error);
     return res.status(400).render("upload", {
       pageTitle: "Upload Video",
       errorMessage: error._message,

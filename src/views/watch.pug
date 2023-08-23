@@ -1,6 +1,10 @@
 extends base
 
 block content
+    //- 비디오컨트롤러에서 const video = await Video.findById(id);로 db에서 video를 찾은다음 
+    //- 그 비디오를 video변수로 보내고 있음
+    //- return res.render("watch", { pageTitle: video.title, video });
+    video(src="/" + video.fileUrl, controls)
     div
         p=video.description
         small=video.createdAt

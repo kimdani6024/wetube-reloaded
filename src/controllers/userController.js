@@ -232,13 +232,14 @@ export const postEdit = async (req, res) => {
   const {
     // req.session.user에서 현재 로그인된 아이디 얻기
     session: { 
-      user: { _id }, 
+      user: { _id, avatarUrl },
     },
     // edit-profile.pug에서 오는거임
     body: { name, email, username, location },
     file,
   } = req;
   // req.file을 할 수 있는 이유는 userrouter에서 postedit전에 multer를 사용하기 때문
+  // db에 파일을 저장하는게 아니라 파일의 위치를 저장
   console.log(file);
   // username이나 email은 업데이트하지 못하게 막아야함
  
@@ -248,6 +249,9 @@ export const postEdit = async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(_id,
       {
+        // 유저가 form으로 파일을 보냈다면 file.path를 쓰고 아니면 기존 avatarUrl를 쓴다.
+        // form에 파일이 있다면 req에 있는 file object를 사용할 수 있다는 것 -> file.path가 존재한다는 것 
+        avatarUrl: file ? file.path : avatarUrl,
         name,
         email,
         username,

@@ -40,4 +40,18 @@ export const protectorMiddleware = (req, res, next) => {
   };
 
   // 사용자가 보낸 파일을 uploads 풀더에 저장
-  export const uploadFiles = multer({ dest: "uploads/" });
+  // 컨트롤러에 파일정보 전송
+  export const avatarUpload = multer({
+    dest: "uploads/avatars/",
+    limits: {
+      // https://www.npmjs.com/package/multer
+      // 용량 : byte기준임
+      fileSize: 3000000,
+    },
+  });
+  export const videoUpload = multer({
+    dest: "uploads/videos/",
+    limits: {
+      fileSize: 10000000,
+    },
+  });

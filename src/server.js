@@ -58,6 +58,8 @@ app.use(
 
 //middleware는 session 다음에 와야함
 app.use(localsMiddleware);
+// 풀더를 노출시키는 방법. 노출시키고 싶은 풀더의 이름을 쓰면됌. 디렉토리 내부의 파일을 제공한다
+app.use("/uploads", express.static("uploads"));
 app.use("/", rootRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);
