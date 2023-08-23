@@ -236,7 +236,10 @@ export const postEdit = async (req, res) => {
     },
     // edit-profile.pug에서 오는거임
     body: { name, email, username, location },
+    file,
   } = req;
+  // req.file을 할 수 있는 이유는 userrouter에서 postedit전에 multer를 사용하기 때문
+  console.log(file);
   // username이나 email은 업데이트하지 못하게 막아야함
  
   // user를 찾아서 업데이트 해줘야함
@@ -257,7 +260,7 @@ export const postEdit = async (req, res) => {
     req.session.user = updatedUser;
     return res.redirect("/users/edit");
   } 
-  // username, email은 user.js에서 unique: true임 
+  // username, email은 user.js에서 unique: true임. 그래서 업데이트하려면 에러가 남
   catch (error) {
     return res
       .status(400)
@@ -268,6 +271,44 @@ export const postEdit = async (req, res) => {
   }
 };
 
+export const getChangePassword = (req, res) => {
+  // 깃허브 사용자 : 비밀번호가 없어서 비밀번호 변경 불가
+  if (req.session.user.socialOnly === true) {
+    return res.redirect("/");
+  }
+  return res.render("users/change-password", { pageTitle: "Change Password" });
+};
+
+export const postChangePassword = async (req, res) => {
+  const {
+    // 로그인을 한 유저가 누구인지 알아야함
+    session: {
+      user: { _id },
+    },
+    body: { oldPassword, newPassword, newPasswordConfirmation },
+  } = req;
+
+  const user = await User.findById(_id);
+  const ok = await bcrypt.compare(oldPassword, user.password);
+  if (!ok) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "The current password is incorrect",
+    });
+  }
+  if (newPassword !== newPasswordConfirmation) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "The password does not match the confirmation",
+    });
+  }
+  // 비밀번호 변경하기
+  user.password = newPassword;
+  // 비밀번호 저장은 user.js에서 함. 비밀번호 해시됌
+  await user.save();
+  // 비밀번호 바꾸면 로그아웃됌
+  return res.redirect("/users/logout");
+};
 
 
   export const see = (req, res) => res.send("See User");

@@ -1,3 +1,5 @@
+import multer from "multer";
+
 //lovals에 로그인한 사용자를 추가
 //우리의 pug이 누가 로그인 했는지 알 수 있음
 
@@ -36,3 +38,6 @@ export const protectorMiddleware = (req, res, next) => {
       return res.redirect("/");
     }
   };
+
+  // 사용자가 보낸 파일을 uploads 풀더에 저장
+  export const uploadFiles = multer({ dest: "uploads/" });

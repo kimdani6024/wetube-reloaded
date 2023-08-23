@@ -1,9 +1,17 @@
 extends base
 
 block content
-    form(method="POST")
+    //- 파일을 백엔드로 보내기 위한 조건 enctype
+    form(method="POST", enctype="multipart/form-data")
+        label(for="avatar") Avatar
+        input(type="file", id="avatar", name="avatar", accept="image/*")
         input(placeholder="Name", name="name", type="text", required, value=loggedInUser.name)
         input(placeholder="Email", name="email", type="email", required, value=loggedInUser.email)
         input(placeholder="Username", name="username", type="text", required, value=loggedInUser.username)
         input(placeholder="Location", name="location", type="text", required, value=loggedInUser.location)
         input(type="submit", value="Update Profile")
+        //- 깃허브로 로그인하지 않은 경우에만 비밀번호 변경할 수 있도록(깃허브 로그인 - 비밀번호x)
+        if !loggedInUser.socialOnly
+            hr
+            //- href="users/change-password"와 같음
+            a(href="change-password") Change Password &rarr;
