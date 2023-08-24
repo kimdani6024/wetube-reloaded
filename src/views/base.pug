@@ -15,6 +15,9 @@ html(lang="ko")
                     if loggedIn
                         li
                             a(href="/videos/upload") Upload Video
+                        li
+                            //- 로그인한 유저의 _id로 감 loggedInUser는 미들웨어에
+                            a(href=`/users/${loggedInUser._id}`) My Profile
                         li 
                             a(href="/users/edit") Edit Profile
                         li 

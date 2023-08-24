@@ -1,5 +1,5 @@
 import Video from "../models/Video";
-
+import User from "../models/User";
 
 //view name 쓰기 home
 //res.render로 home.pug를 렌더링
@@ -40,7 +40,13 @@ export const watch = async (req, res) => {  // videoRouter.get("/:id(\\d+)", see
   // const id = req.params.id;
   const { id } = req.params;
   //findById는 id로 영상을 찾아낼 수 있는 기능을 지원해줌
-  const video = await Video.findById(id);
+  // const video = await Video.findById(id);
+  // const owner = await User.findById(video.owner);
+  // 몽구스는 objectID가 User에서 오는 걸 암
+  // populate를 하지 않으면 그저 string값만 가짐 
+  // populate를 하면 User 객체 전체를 값으로 가짐 > owner : objectid > 이 id가 user에서 옴
+  const video = await Video.findById(id).populate("owner");
+
   if (!video) {
     return res.render("404", { pageTitle: "Video not found." });
   }
@@ -96,6 +102,11 @@ export const getUpload = (req, res) => {
 };
 
 export const postUpload = async (req, res) => {
+  // 영상을 업로드할때 업로드하는 사용자의 id를 전송해야함
+  // 현재 로그인된 사용자를 말함
+  const {
+    user: { _id },
+  } = req.session;
   // multer는 req.file을 제공해줌. file안에 path가 있음
   // fileUrl만들어주기 > video.js에서
   const { path: fileUrl } = req.file;
@@ -109,6 +120,8 @@ export const postUpload = async (req, res) => {
       title,
       description,
       fileUrl,
+      // video의 owner로 현재 로그인중인 유저의 id를 쓰겠다는뜻임.
+      owner: _id,
       hashtags: Video.formatHashtags(hashtags),
     });
     return res.redirect("/");

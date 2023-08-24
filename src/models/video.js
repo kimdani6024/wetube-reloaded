@@ -15,6 +15,15 @@ const videoSchema = new mongoose.Schema({
     views: { type: Number, default: 0, required: true },
     rating: { type: Number, default: 0, required: true },
   },
+  // video와 user를 연결시키기 위해서 db에서 db.users.remove({}), db.videos.remove({})해주기  
+  // user : 해당 user가 업로드한 모든 영상의 id를 저장해줌
+  // video : 해당 영상을 올린 user의 id를 저장해줌
+  // ObjectId는 오직 mongoose에서만
+  // ref : mongoose에게 owner에 id를 저장하겠다고 알려줘야 하기 떄문
+  // mongoose에게 owner가 어떤 model의 objectld라고 알려줄거임. 
+  // user.js const User = mongoose.model("User", userSchema);
+  
+  owner: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
 });
 
 // export const formatHashtags = (hashtags) =>

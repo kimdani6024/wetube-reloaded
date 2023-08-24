@@ -1,4 +1,5 @@
 import User from "../models/User";
+import Video from "../models/Video";
 import fetch from "node-fetch";
 import bcrypt from "bcrypt";
 
@@ -285,7 +286,7 @@ export const getChangePassword = (req, res) => {
 
 export const postChangePassword = async (req, res) => {
   const {
-    // 로그인을 한 유저가 누구인지 알아야함
+    // 로그인을 한 유저가 누구인지 알아야함. 누구나 알 수 없게 session에서 가져와서 유저가 누군지 알아야함
     session: {
       user: { _id },
     },
@@ -314,5 +315,25 @@ export const postChangePassword = async (req, res) => {
   return res.redirect("/users/logout");
 };
 
-
-  export const see = (req, res) => res.send("See User");
+// 프로필에 들어가면 해당 유저가 올린 영상들을 볼 수 있게
+// 영상을 틀면 누가 올렸는지 확인
+export const see = async (req, res) => {
+  // public으로 만들어야하니까 url에 있는 user id를 가져옴. 
+  // session에서 가져오지 않음 왜냐하면 누구나 봐야하니까
+  // 누구나 사용자의 프로필을 볼 수 있어야함
+  const { id } = req.params;
+  const user = await User.findById(id);
+  if (!user) {
+    return res.status(404).render("404", { pageTitle: "User not found." });
+  }
+  // 특정 사용자가 올린 모든 영상을 찾아냄
+  // 비디오를 올린사람 (owner id)과 어떤? 사용자(params의 id)가 같으면 사용자의 계정에서 그 사용자가 올린 비디오들을 전부 찾아 보여준다. 
+  const videos = await Video.find({ owner: user._id });
+  // 위에서 찾은 user를 template에 보내주기만 하면 됌
+  return res.render("users/profile", {
+    pageTitle: user.name,
+    user,
+    // array니까 include ../mixins/video 해줌
+    videos,
+  });
+};
