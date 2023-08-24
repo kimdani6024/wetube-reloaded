@@ -17,7 +17,10 @@ const userSchema = new mongoose.Schema({
 userSchema.pre("save", async function () {
   //this = creat되는 user를 가리킴
   //bcrypt.hash(암호화될 데이터, saltRounds = 몇번 해싱할지)
-  this.password = await bcrypt.hash(this.password, 5);
+  // 비밀번호 수정될떄만 hash되게함
+  if (this.isModified("password")) {
+    this.password = await bcrypt.hash(this.password, 5);
+  }
 });
 
 const User = mongoose.model("User", userSchema);

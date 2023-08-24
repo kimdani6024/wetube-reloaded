@@ -7,13 +7,12 @@ const videoSchema = new mongoose.Schema({
   //trim:공백을 없애줌
   title: { type: String, required: true, trim: true, maxLength: 80 },
   fileUrl: { type: String, required: true },
-  description: { type: String, required: true, trim: true, minLength: 20 },
+  description: { type: String, required: true, trim: true},
   //default: Date.now는 즉각 실행하지만 mongoose가 내가 새로운 비디오를 생성했을 때만 실행시켜줌
   createdAt: { type: Date, required: true, default: Date.now },
   hashtags: [{ type: String, trim: true }],
   meta: {
     views: { type: Number, default: 0, required: true },
-    rating: { type: Number, default: 0, required: true },
   },
   // video와 user를 연결시키기 위해서 db에서 db.users.remove({}), db.videos.remove({})해주기  
   // user : 해당 user가 업로드한 모든 영상의 id를 저장해줌

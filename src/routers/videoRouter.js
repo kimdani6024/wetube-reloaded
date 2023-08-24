@@ -21,7 +21,6 @@ videoRouter
   .get(getEdit)
   .post(postEdit);
 
-
 videoRouter
   .route("/:id([0-9a-f]{24})/delete")
   .all(protectorMiddleware)

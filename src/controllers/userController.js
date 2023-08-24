@@ -232,6 +232,7 @@ export const postEdit = async (req, res) => {
   // const {user:{id}} = req.session; == const id = req.session.user.id 
   // const {name, email, username, location} = req.body;
   const {
+    // 로그인한유저정보
     // req.session.user에서 현재 로그인된 아이디 얻기
     session: { 
       user: { _id, avatarUrl },
@@ -287,6 +288,7 @@ export const getChangePassword = (req, res) => {
 
 export const postChangePassword = async (req, res) => {
   const {
+    // 로그인한유저정보
     // 로그인을 한 유저가 누구인지 알아야함. 누구나 알 수 없게 session에서 가져와서 유저가 누군지 알아야함
     session: {
       user: { _id },
@@ -311,7 +313,7 @@ export const postChangePassword = async (req, res) => {
   // 비밀번호 변경하기
   user.password = newPassword;
   // 비밀번호 저장은 user.js에서 함
-  // save()가 실행될때마다 hash가 일어남 > 미들웨어
+  // save()가 실행될때마다 hash가 일어남 > user.js
   await user.save();
   // 비밀번호 바꾸면 로그아웃됌
   return res.redirect("/users/logout");
@@ -320,6 +322,7 @@ export const postChangePassword = async (req, res) => {
 // 프로필에 들어가면 해당 유저가 올린 영상들을 볼 수 있게
 // 영상을 틀면 누가 올렸는지 확인
 export const see = async (req, res) => {
+  // 유저정보
   // public으로 만들어야하니까 url에 있는 user id를 가져옴. 
   // session에서 가져오지 않음 왜냐하면 누구나 봐야하니까
   // 누구나 사용자의 프로필을 볼 수 있어야함
@@ -337,7 +340,5 @@ export const see = async (req, res) => {
   return res.render("users/profile", {
     pageTitle: user.name,
     user,
-    // array니까 include ../mixins/video 해줌
-    // videos,
   });
 };

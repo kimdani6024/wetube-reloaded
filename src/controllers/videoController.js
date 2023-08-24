@@ -56,7 +56,13 @@ export const watch = async (req, res) => {  // videoRouter.get("/:id(\\d+)", see
 
 export const getEdit = async (req, res) => {
   //수정할 비디오 id를 찾아야함
+  // 비디오정보
   const { id } = req.params;
+  // user 정보
+  const {
+    user: { _id },
+  } = req.session;
+
   //video object가 꼭 필요함. 
   //object를 edit template(return res.render("edit", { pageTitle: `Edit: ${video.title}`, video });)로 보내줘야해서
   const video = await Video.findById(id);
@@ -64,11 +70,21 @@ export const getEdit = async (req, res) => {
   if (!video) {
     return res.status(404).render("404", { pageTitle: "Video not found." });
   }
+  //비디오 주인과 유저가 같은사람이 아니면 비디오 편집못하게 막음
+  // 자바스크립트에선 데이터형식도 비교하기때문에 string을 입혀줘서 비교하자
+  // watch.pug도 같음
+  if (String(video.owner) !== String(_id)) {
+    return res.status(403).redirect("/");
+  }
   //video가 존재한다면
   return res.render("edit", { pageTitle: `Edit: ${video.title}`, video });
 };
 
 export const postEdit = async (req, res) => {
+  const {
+    user: { _id },
+  } = req.session;
+  // 비디오정보
   //video object가 필요없음 단순히 영상이 존재하는지만 확인하면 됌
   //어느 비디오를 수정중인지 알아야하니까
   //video route로부터 id를 얻어와서 /video/id페이지로 redirect(자동이동)시켜줌
@@ -80,10 +96,13 @@ export const postEdit = async (req, res) => {
   const { title, description, hashtags } = req.body;
   //영상을 검색
   //https://mongoosejs.com/docs/api/model.html#Model.exists() 
-  const video = await Video.exists({ _id: id });
+  const video = await Video.findById(id);
   //영상 존재하는지 확인, 없다면 404 렌더
   if (!video) {
     return res.status(404).render("404", { pageTitle: "Video not found." });
+  }
+  if (String(video.owner) !== String(_id)) {
+    return res.status(403).redirect("/");
   }
   //영상 정보 업데이트
   //두개의 인자가 필요, 1 : 업데이트 하고 하자는 영상의 id, 2 : 업데이트할 정보 혹은 내용
@@ -92,10 +111,10 @@ export const postEdit = async (req, res) => {
     description,
     hashtags: Video.formatHashtags(hashtags),
   });
-  await video.save();
   //videoRouter.route("/:id([0-9a-f]{24})/edit").get(getEdit).post(postEdit);
   return res.redirect(`/videos/${id}`);
 };
+
 
 export const getUpload = (req, res) => {
   return res.render("upload", { pageTitle: "Upload Video" });
@@ -119,19 +138,21 @@ export const postUpload = async (req, res) => {
     // newVideo id를 User의 videos array에 추가
     const newVideo = await Video.create({
       title,
-      description,
       fileUrl,
+      description,
       // 영상의 소유주인 현재 로그인중인 유저의 id를 쓰겠다는뜻임.
       owner: _id,
       hashtags: Video.formatHashtags(hashtags),
     });
-    // User모델 찾기
+
+    // User 찾기
     const user = await User.findById(_id);
     // 업로드될 영상의 id(출저,기록)을 user model에도 저장해줘야 함.
     // array에 요소를 추가할때는 push
     user.videos.push(newVideo._id);
     user.save();
     return res.redirect("/");
+
   } catch (error) {
     console.log(error);
     return res.status(400).render("upload", {
@@ -142,9 +163,29 @@ export const postUpload = async (req, res) => {
 };
 
 export const deleteVideo = async (req, res) => {
+  // 비디오정보 
   const { id } = req.params;
+
+  const {
+    user: { _id },
+  } = req.session;
+  // 비디오찾기 exist말고 findById하기
+  const video = await Video.findById(id);
+  // 유저찾기
+  const user = await User.findById(_id);
+  if (!video) {
+    return res.status(404).render("404", { pageTitle: "Video not found." });
+  }
+  // 비디오를 찾으면, 영상 주인이 로그인된 유저의 id와 같은지 체크
+  // populate는 전체정보가 제공되서 안씀.여기서는 id만 필요하니까
+  if (String(video.owner) !== String(_id)) {
+    return res.status(403).redirect("/");
+  }
+
   //remove말고 findByIdAndDelete을 쓰자
   await Video.findByIdAndDelete(id);
+  user.videos.splice(user.videos.indexOf(id),1);
+  user.save();
   return res.redirect("/");
 };
 
