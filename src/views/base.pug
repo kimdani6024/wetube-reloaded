@@ -3,6 +3,8 @@ html(lang="ko")
     head
         title #{pageTitle} | #{siteName}
         link(rel="stylesheet" href="https://unpkg.com/mvp.css")
+        //- css파일들을 로딩하는 곳
+        link(rel="stylesheet", href="/static/css/styles.css")
     body
         header
             h1=pageTitle
@@ -40,3 +42,5 @@ html(lang="ko")
         main
             block content
     include partials/footer
+    //- 서버한테 assests풀더의 내용물을 /static 주소를 통해 공개하라는 것임
+    script(src="/static/js/main.js") 

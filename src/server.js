@@ -58,8 +58,12 @@ app.use(
 
 //middleware는 session 다음에 와야함
 app.use(localsMiddleware);
+// 앞은 브라우저를 위한 url 뒤에 풀더명은 전혀 다를 수 있음
 // 풀더를 노출시키는 방법. 노출시키고 싶은 풀더의 이름을 쓰면됌. 디렉토리 내부의 파일을 제공한다
+// static:정적파일, express한테 사람들이 이 풀더안에 있는 파일들을 볼 수 있게 해달라고 요청하는 것 
 app.use("/uploads", express.static("uploads"));
+// webpack.config.js에서 실행하면 만들어진 풀더 assets도 풀더를 노출시켜야함
+app.use("/static", express.static("assets"));
 app.use("/", rootRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);
