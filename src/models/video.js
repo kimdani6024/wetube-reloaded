@@ -22,7 +22,7 @@ const videoSchema = new mongoose.Schema({
   // ref : mongoose에게 owner에 id를 저장하겠다고 알려줘야 하기 떄문
   // mongoose에게 owner가 어떤 model의 objectld라고 알려줄거임. 
   // user.js const User = mongoose.model("User", userSchema);
-  
+  // 1개의 영상은 소유주가 1명이지만, 소유주는 여러 영상을 소유할 수 있어서 array임
   owner: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
 });
 

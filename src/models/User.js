@@ -9,6 +9,8 @@ const userSchema = new mongoose.Schema({
   password: { type: String },
   name: { type: String, required: true },
   location: String,
+  // 1개의 영상은 소유주가 1명이지만, 소유주는 여러 영상을 소유할 수 있어서 []array임
+  videos: [{ type: mongoose.Schema.Types.ObjectId, ref: "Video" }],
 });
 
 //유저가 form에 입력한 password로 저장되지 않고 해싱한 다음에 암호화된 데이터가 저장

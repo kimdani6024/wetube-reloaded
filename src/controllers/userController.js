@@ -222,11 +222,12 @@ export const logout = (req, res) => {
   return res.redirect("/");
 };
 
-
+// 영상소유주만 form을 보고 제출할 수 있게
 export const getEdit = (req, res) => {
   return res.render("edit-profile", { pageTitle: "Edit Profile" });
 };
 
+// 영상 소유주만 수정가능하도록
 export const postEdit = async (req, res) => {
   // const {user:{id}} = req.session; == const id = req.session.user.id 
   // const {name, email, username, location} = req.body;
@@ -309,7 +310,8 @@ export const postChangePassword = async (req, res) => {
   }
   // 비밀번호 변경하기
   user.password = newPassword;
-  // 비밀번호 저장은 user.js에서 함. 비밀번호 해시됌
+  // 비밀번호 저장은 user.js에서 함
+  // save()가 실행될때마다 hash가 일어남 > 미들웨어
   await user.save();
   // 비밀번호 바꾸면 로그아웃됌
   return res.redirect("/users/logout");
@@ -322,18 +324,20 @@ export const see = async (req, res) => {
   // session에서 가져오지 않음 왜냐하면 누구나 봐야하니까
   // 누구나 사용자의 프로필을 볼 수 있어야함
   const { id } = req.params;
-  const user = await User.findById(id);
+  // 특정 사용자가 올린 모든 영상을 찾아냄
+  // 비디오를 올린사람 (owner id)과 어떤? 사용자(params의 id)가 같으면 사용자의 계정에서 그 사용자가 올린 비디오들을 전부 찾아 보여준다. 
+  // const videos = await Video.find({ owner: user._id });
+  // populate가 없으면 id만 출력. populate가 있으면 object전체가 불러짐
+  const user = await User.findById(id).populate("videos");
+
   if (!user) {
     return res.status(404).render("404", { pageTitle: "User not found." });
   }
-  // 특정 사용자가 올린 모든 영상을 찾아냄
-  // 비디오를 올린사람 (owner id)과 어떤? 사용자(params의 id)가 같으면 사용자의 계정에서 그 사용자가 올린 비디오들을 전부 찾아 보여준다. 
-  const videos = await Video.find({ owner: user._id });
   // 위에서 찾은 user를 template에 보내주기만 하면 됌
   return res.render("users/profile", {
     pageTitle: user.name,
     user,
     // array니까 include ../mixins/video 해줌
-    videos,
+    // videos,
   });
 };

@@ -116,14 +116,21 @@ export const postUpload = async (req, res) => {
   //try는 video.js에서 required: true입력함으로써 생기는 에러를 잡기위해 사용
   //DB에 new video를 저장하는것. new video는 js object를 생성하는 것
   try {
-    await Video.create({
+    // newVideo id를 User의 videos array에 추가
+    const newVideo = await Video.create({
       title,
       description,
       fileUrl,
-      // video의 owner로 현재 로그인중인 유저의 id를 쓰겠다는뜻임.
+      // 영상의 소유주인 현재 로그인중인 유저의 id를 쓰겠다는뜻임.
       owner: _id,
       hashtags: Video.formatHashtags(hashtags),
     });
+    // User모델 찾기
+    const user = await User.findById(_id);
+    // 업로드될 영상의 id(출저,기록)을 user model에도 저장해줘야 함.
+    // array에 요소를 추가할때는 push
+    user.videos.push(newVideo._id);
+    user.save();
     return res.redirect("/");
   } catch (error) {
     console.log(error);
