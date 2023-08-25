@@ -331,7 +331,13 @@ export const see = async (req, res) => {
   // 비디오를 올린사람 (owner id)과 어떤? 사용자(params의 id)가 같으면 사용자의 계정에서 그 사용자가 올린 비디오들을 전부 찾아 보여준다. 
   // const videos = await Video.find({ owner: user._id });
   // populate가 없으면 id만 출력. populate가 있으면 object전체가 불러짐
-  const user = await User.findById(id).populate("videos");
+  const user = await User.findById(id).populate({
+    path: "videos",
+    populate: {
+      path: "owner",
+      model: "User",
+    },
+  });
 
   if (!user) {
     return res.status(404).render("404", { pageTitle: "User not found." });

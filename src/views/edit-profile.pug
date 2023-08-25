@@ -3,9 +3,10 @@ extends base
 block content
     //- src=loggedInUser.avatarUrl는 .users.uploads
     //- 밑에는 /uploads
-    img(src="/" + loggedInUser.avatarUrl, width="100", height="100")
+    //- img(src="/" + loggedInUser.avatarUrl, width="100", height="100")
     //- 파일을 백엔드로 보내기 위한 조건 enctype
-    form(method="POST", enctype="multipart/form-data")
+    //- form(method="POST", enctype="multipart/form-data")
+    form(method="POST", enctype="multipart/form-data").edit-profile__form        
         label(for="avatar") Avatar
         input(type="file", id="avatar", name="avatar", accept="image/*")
         input(placeholder="Name", name="name", type="text", required, value=loggedInUser.name)
@@ -15,6 +16,8 @@ block content
         input(type="submit", value="Update Profile")
         //- 깃허브로 로그인하지 않은 경우에만 비밀번호 변경할 수 있도록(깃허브 로그인 - 비밀번호x)
         if !loggedInUser.socialOnly
-            hr
+            //- hr
             //- href="users/change-password"와 같음
-            a(href="change-password") Change Password &rarr;
+            //- a(href="change-password") Change Password &rarr;
+            div.edit-profile__password
+                a(href="change-password") Change Password &rarr;

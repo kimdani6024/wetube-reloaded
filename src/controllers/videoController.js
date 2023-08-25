@@ -27,7 +27,9 @@ export const home = async (req, res) => {
   //위에서 아래로 순서대로 출력해줌 
   //코드 실행 중 오류 발생시 아래코드 출력해줌 
   //desc : 내림차순
-  const videos = await Video.find({}).sort({ createdAt: "desc" });
+  const videos = await Video.find({})
+  .sort({ createdAt: "desc" })
+  .populate("owner");
   //render뒤에 redirect가 올때 유의해야함. 두 function중 하나만 옴. return을 적어서 실수를 방지하는 게 좋음
   return res.render("home", { pageTitle: "Home", videos });
 }
@@ -208,7 +210,7 @@ export const search = async (req, res) => {
         //https://docs.mongodb.com/manual/reference/operator/query/regex/
         $regex: new RegExp(`${keyword}$`, "i"),
       },
-    });
+    }).populate("owner");
   }
   //serch.pug가 base.pug를 기본으로 하고 있어서 꼭 pagetitle을 써줘야함
   return res.render("search", { pageTitle: "Search", videos });

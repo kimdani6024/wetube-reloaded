@@ -2,45 +2,17 @@ doctype html
 html(lang="ko")
     head
         title #{pageTitle} | #{siteName}
-        link(rel="stylesheet" href="https://unpkg.com/mvp.css")
+        //- link(rel="stylesheet" href="https://unpkg.com/mvp.css")
+
+        //- https://cdnjs.com/libraries/font-awesome/6.4.2에서 복붙
+        link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css")
         //- css파일들을 로딩하는 곳
         link(rel="stylesheet", href="/static/css/styles.css")
+     
     body
-        header
-            h1=pageTitle
-            nav
-                ul
-                    li
-                        a(href="/") Home
-                    //- pug파일에서 locals에 접근할 수 있음. 로그인 된 상태
-                    //- middlewares.js에서 옴 loggedIn이 session에 user가 있는지 확인해야함
-                    if loggedIn
-                        li
-                            a(href="/videos/upload") Upload Video
-                        li
-                            //- 로그인한 유저의 _id로 감 loggedInUser는 미들웨어에
-                            a(href=`/users/${loggedInUser._id}`) My Profile
-                        li 
-                            a(href="/users/edit") Edit Profile
-                        li 
-                            a(href="/users/logout")  Log Out
-
-                        //- 로그인 되어 있다 > loggedInUser값이 있다
-                        //- middleware.js : res.locals.loggedInUser = req.session.user;로 할당
-                        //- li 
-                        //-     a(href="/my-profile") #{loggedInUser.name}의 Profile
-                    else
-                        li
-                            a(href="/join")  Join
-                        li
-                            a(href="/login")  Login 
-
-                    li
-                        a(href="/search") Search
-
-                        
+        include partials/header                   
         main
             block content
-    include partials/footer
+        include partials/footer
     //- 서버한테 assests풀더의 내용물을 /static 주소를 통해 공개하라는 것임
     script(src="/static/js/main.js") 
