@@ -13,7 +13,7 @@ module.exports = {
     // 시작코드
     entry: {
         main: "./src/client/js/main.js",
-        videoPlayer: "./src/client/js/videoplayer.js",
+        videoPlayer: "./src/client/js/videoPlayer.js",
       },
     // 결과물을 어떤 파일이름으로 어디에 저장할지도 지정해주기
     mode: 'development',
@@ -28,6 +28,8 @@ module.exports = {
     output: {
         // 각각을 서로 다른 디렉토리로 보낼 수 있음
         // 시작점 assets/js/main.js임
+        // 연결 : base.pug
+        // [name]은 entry에 있는 이름 가져감:main, videoPlayer
         filename: "js/[name].js",
         path: path.resolve(__dirname, "assets"),
         // assets자동삭제 하도록

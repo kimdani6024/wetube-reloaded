@@ -1,20 +1,33 @@
+//- client/videoplayer.js연결
+
 extends base
 
 block content
     //- 비디오컨트롤러에서 const video = await Video.findById(id);로 db에서 video를 찾은다음 
     //- 그 비디오를 video변수로 보내고 있음
     //- return res.render("watch", { pageTitle: video.title, video });
+    //- id(#)부여하고 client-js-videoPlayer.js로 감
     video(src="/" + video.fileUrl, controls)
     div
-        p=video.description
-        small=video.createdAt
-    div
-        small Uploaded by 
-            a(href=`/users/${video.owner._id}`)=video.owner.name
-        //- 영상 owner의 id와 로그인된 사람의 id가 일치하면 로그인된 사용자가 이 영상의 주인
-        //- 로그인된 사람의 id는 미들웨어에서 알려줌 res.locals.loggedInUser = req.session.user || {};
-    if String(video.owner._id) === String(loggedInUser._id)
-        a(href=`${video.id}/edit`) Edit Video &rarr;
-        br
-        a(href=`${video.id}/delete`) Delete Video &rarr;
-    
+        button#play Play
+        //- 음소거
+        button#mute Mute
+        span#time 00:00/00:00
+        input(type="range",step="0.1", min="0", max="1")#volume
+    //- 
+        div
+            p=video.description
+            small=video.createdAt
+        div
+            small Uploaded by 
+                a(href=`/users/${video.owner._id}`)=video.owner.name
+            //- 영상 owner의 id와 로그인된 사람의 id가 일치하면 로그인된 사용자가 이 영상의 주인
+            //- 로그인된 사람의 id는 미들웨어에서 알려줌 res.locals.loggedInUser = req.session.user || {};
+        if String(video.owner._id) === String(loggedInUser._id)
+            a(href=`${video.id}/edit`) Edit Video &rarr;
+            br
+            a(href=`${video.id}/delete`) Delete Video &rarr;
+block scripts
+    //- static url로 가면, 유저에게 assets 풀더를 접근할 수 있는 권한을 준다
+    //- server.js app.use("/static", express.static("assets"));
+    script(src="/static/js/videoPlayer.js") 

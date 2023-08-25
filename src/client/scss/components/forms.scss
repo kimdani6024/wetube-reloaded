@@ -9,7 +9,8 @@ form {
     }
   }
   
-  input {
+  // watch.pug에서 #volume이 너무 커서 제외시켜줘야함
+  input:not([type="range"]) {
     all: unset;
     padding: 15px 20px;
     border-radius: 5px;

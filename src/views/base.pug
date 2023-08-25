@@ -12,7 +12,10 @@ html(lang="ko")
     body
         include partials/header                   
         main
+            //- 다른 모든 템플릿을 채울 수 있음
             block content
         include partials/footer
     //- 서버한테 assests풀더의 내용물을 /static 주소를 통해 공개하라는 것임
-    script(src="/static/js/main.js") 
+    //- script(src="/static/js/main.js") 
+    //- watch에도 block scripts
+    block scripts 
