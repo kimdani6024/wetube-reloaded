@@ -1,0 +1,19 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "dev:server",
+			"problemMatcher": [],
+			"label": "npm: dev:server",
+			"detail": "nodemon"
+		},
+		{
+			"type": "npm",
+			"script": "dev:assets",
+			"problemMatcher": [],
+			"label": "npm: dev:assets",
+			"detail": "webpack"
+		}
+	]
+}

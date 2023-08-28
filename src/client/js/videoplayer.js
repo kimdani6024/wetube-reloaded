@@ -3,8 +3,16 @@
 const video = document.querySelector("video");
 const playBtn = document.getElementById("play");
 const muteBtn = document.getElementById("mute");
-const time = document.getElementById("time");
 const volumeRange = document.getElementById("volume");
+const currenTime = document.getElementById("currenTime");
+const totalTime = document.getElementById("totalTime");
+const timeline = document.getElementById("timeline");
+const fullScreenBtn = document.getElementById("fullScreen");
+const videoContainer = document.getElementById("videoContainer");
+const videoControls = document.getElementById("videoControls");
+
+let controlsTimeout = null;
+let controlsMovementTimeout = null;
 
 // 볼륨시작. 0.5
 let volumeValue = 0.5;
@@ -63,6 +71,87 @@ const handleMuteClick = (e) => {
     video.volume = value;
   };
 
+  
+  const formatTime = (seconds) =>
+  new Date(seconds * 1000).toISOString().substr(11, 8);
+
+
+  // 현재 비디오 시간
+  const handleTimeUpdate = () => {
+    currenTime.innerText = formatTime(Math.floor(video.currentTime));
+    // watch.pug     
+    timeline.value = Math.floor(video.currentTime);
+  };
+  
+  // 누른곳으로 비디오시간 이동
+  const handleTimelineChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    // 비디오 이동시간으로 값이 바뀌게
+    video.currentTime = value;
+  };
+
+  // 비디오시간
+  const handleLoadedMetadata = () => {
+    // https://stackoverflow.com/questions/33316493/why-does-loadedmetadata-not-consistently-fire
+    totalTime.innerText = formatTime(Math.floor(video.duration));
+    // watch.pug 
+    timeline.max = Math.floor(video.duration);
+  };
+
+  // 엔터키로 재생 및 일시정지
+  const handlePlayenter = (event) => {
+    if (event.code == "Enter") {
+      handlePlayClick();
+      }
+  };
+
+  const handleFullscreen = () => {
+    const fullscreen = document.fullscreenElement;
+    if (fullscreen) {
+      document.exitFullscreen();
+      fullScreenBtn.innerText = "Enter Full Screen";
+    } 
+    else {
+      videoContainer.requestFullscreen();
+      fullScreenBtn.innerText = "Exit Full Screen";
+    }
+  };
+
+
+  const hideControls = () => videoControls.classList.remove("showing");
+
+
+  const handleMouseMove = () => {
+    // 3. 비디오 안에 있다가 나갔다 들어오면 timeout 취소
+    if (controlsTimeout) {
+      clearTimeout(controlsTimeout);
+      controlsTimeout = null;
+    }
+    if (controlsMovementTimeout) {
+      clearTimeout(controlsMovementTimeout);
+      controlsMovementTimeout = null;
+    }
+    // 1 .처음 비디오 안으로 들어온다면 showing 
+    videoControls.classList.add("showing");
+    controlsMovementTimeout = setTimeout(hideControls, 3000);
+  };
+  
+  const handleMouseLeave = () => {
+    // 2. 비디오 밖으로 나간다면 time out
+    controlsTimeout = setTimeout(hideControls, 3000);
+  };
+  
+
 playBtn.addEventListener("click", handlePlayClick);
 muteBtn.addEventListener("click", handleMuteClick);
 volumeRange.addEventListener("input", handleVolumeChange);
+video.addEventListener("loadedmetadata", handleLoadedMetadata);
+// 시간이 변경되는 걸 감지하는 evnet
+video.addEventListener("timeupdate", handleTimeUpdate);
+timeline.addEventListener("input", handleTimelineChange);
+window.addEventListener("keydown", handlePlayenter);
+fullScreenBtn.addEventListener("click", handleFullscreen);
+video.addEventListener("mousemove", handleMouseMove);
+video.addEventListener("mouseleave", handleMouseLeave);
