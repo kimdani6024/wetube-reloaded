@@ -3,26 +3,27 @@
 extends base
 
 block content
-    //- 비디오컨트롤러에서 const video = await Video.findById(id);로 db에서 video를 찾은다음 
-    //- 그 비디오를 video변수로 보내고 있음
-    //- return res.render("watch", { pageTitle: video.title, video });
-    //- id(#)부여하고 client-js-videoPlayer.js로 감
-    div#videoContainer
-        video(src="/" + video.fileUrl)
-        div#videoControls
-            button#play Play
-            //- 음소거
-            button#mute Mute
-            input(type="range",step="0.1", value=0.5, min="0", max="1")#volume
-            div
-                span#currenTime 00:00
-                span  / 
-                span#totalTime 00:00
-            div 
-                //- 시간조절
-                input(type="range",step="1", value="0", min="0")#timeline
-            div
-                button#fullScreen Enter Full Screen
+        //- 비디오컨트롤러에서 const video = await Video.findById(id);로 db에서 video를 찾은다음 
+        //- 그 비디오를 video변수로 보내고 있음
+        //- return res.render("watch", { pageTitle: video.title, video });
+        //- id(#)부여하고 client-js-videoPlayer.js로 감
+
+        div#videoControls.videoControls
+            div.videoControls__play
+                span#play.videoControls__playBtn
+                    i.fas.fa-play
+                div.videoControls__time
+                    span#currenTime 00:00
+                    span  / 
+                    span#totalTime 00:00
+            input(type="range",step="1", value="0", min="0")#timeline.videoControls__timeline
+            div.videoControls__volume
+                input(type="range",step="0.1", value=0.5, min="0", max="1")#volume
+                span#mute
+                    i.fas.fa-volume-up
+            div    
+                span#fullScreen
+                    i.fas.fa-expand            
 
     //- 
         div

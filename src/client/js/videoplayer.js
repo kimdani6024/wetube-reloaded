@@ -10,8 +10,15 @@ const timeline = document.getElementById("timeline");
 const fullScreenBtn = document.getElementById("fullScreen");
 const videoContainer = document.getElementById("videoContainer");
 const videoControls = document.getElementById("videoControls");
+const playBtnIcon = playBtn.querySelector("i");
+const muteBtnIcon = muteBtn.querySelector("i");
+const fullScreenIcon = fullScreenBtn.querySelector("i");
+
+
 
 let controlsTimeout = null;
+
+// 마우스가 멈추는걸 감지
 let controlsMovementTimeout = null;
 
 // 볼륨시작. 0.5
@@ -30,7 +37,7 @@ const handlePlayClick = (e) => {
     video.pause();
   }
     // 플레이 버튼을 누르면 pause 버튼으로 보여줌
-  playBtn.innerText = video.paused ? "Play" : "Pause";
+    playBtnIcon.classList = video.paused ? "fas fa-play" : "fas fa-pause";
 };
 
 
@@ -49,7 +56,9 @@ const handleMuteClick = (e) => {
     //muteBtn.innerText = "Mute"
     }
 
-    muteBtn.innerText = video.muted ? "Unmute" : "Mute";
+    muteBtnIcon.classList = video.muted
+    ? "fas fa-volume-mute"
+    : "fas fa-volume-up";
     // 만약 음소거(mute)를 누른상태라면 볼륨이 0이 되어야함. 아니면 원래 볼륨으로 되돌아가기
     volumeRange.value = video.muted ? 0 : volumeValue;
   };
@@ -73,7 +82,7 @@ const handleMuteClick = (e) => {
 
   
   const formatTime = (seconds) =>
-  new Date(seconds * 1000).toISOString().substr(11, 8);
+  new Date(seconds * 1000).toISOString().substr(14, 5);
 
 
   // 현재 비디오 시간
@@ -111,14 +120,23 @@ const handleMuteClick = (e) => {
     const fullscreen = document.fullscreenElement;
     if (fullscreen) {
       document.exitFullscreen();
-      fullScreenBtn.innerText = "Enter Full Screen";
+      fullScreenIcon.classList = "fas fa-expand";
     } 
     else {
       videoContainer.requestFullscreen();
-      fullScreenBtn.innerText = "Exit Full Screen";
+      fullScreenIcon.classList = "fas fa-compress";
     }
   };
 
+// 1. 아무것도 없는 상태에서 비디오 위로 마우스 움직임.
+// 2. 즉시 showing이라는 클래스가 추가되고 3초짜리 showing을 지우는 타이머를 시작시킴.
+// 3. 2초후 마우스를 다시 움직임.
+// 4. if문 구절 때문에 3초짜리 showing을 지우는 타이머가 사라져 버리고, 타이머 값이 null로 바뀜 즉 타이머 사라짐.
+// 5.그대로 클래스 showing만들고 다시 또다른 3초짜리 showing을 지우는 타이머 시작!.
+
+// 그다음에는 무한 반복
+
+// 만약 3초가 지났다? 그러면 타이머가 작동해서 showing을 지움
 
   const hideControls = () => videoControls.classList.remove("showing");
 
@@ -129,12 +147,16 @@ const handleMuteClick = (e) => {
       clearTimeout(controlsTimeout);
       controlsTimeout = null;
     }
+    // 유저가 마우스를 움직이면 오래된 timeout은 취소되고, 
+    // 새로운 timeout(controlsMovementTimeout = setTimeout(hideControls, 3000); 만듬
     if (controlsMovementTimeout) {
       clearTimeout(controlsMovementTimeout);
       controlsMovementTimeout = null;
     }
-    // 1 .처음 비디오 안으로 들어온다면 showing 
+    // 1 .처음 비디오 안으로 들어온다면 showing class실행
+    // 1. 마우스를 움직일때 cleartimeout 실행
     videoControls.classList.add("showing");
+
     controlsMovementTimeout = setTimeout(hideControls, 3000);
   };
   
@@ -147,11 +169,11 @@ const handleMuteClick = (e) => {
 playBtn.addEventListener("click", handlePlayClick);
 muteBtn.addEventListener("click", handleMuteClick);
 volumeRange.addEventListener("input", handleVolumeChange);
-video.addEventListener("loadedmetadata", handleLoadedMetadata);
+video.addEventListener("loadeddata", handleLoadedMetadata);
 // 시간이 변경되는 걸 감지하는 evnet
 video.addEventListener("timeupdate", handleTimeUpdate);
+videoContainer.addEventListener("mousemove", handleMouseMove);
+videoContainer.addEventListener("mouseleave", handleMouseLeave);
 timeline.addEventListener("input", handleTimelineChange);
 window.addEventListener("keydown", handlePlayenter);
 fullScreenBtn.addEventListener("click", handleFullscreen);
-video.addEventListener("mousemove", handleMouseMove);
-video.addEventListener("mouseleave", handleMouseLeave);
