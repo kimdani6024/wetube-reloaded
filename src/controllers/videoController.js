@@ -215,3 +215,17 @@ export const search = async (req, res) => {
   //serch.pug가 base.pug를 기본으로 하고 있어서 꼭 pagetitle을 써줘야함
   return res.render("search", { pageTitle: "Search", videos });
 };
+
+// 영상조회수
+export const registerView = async (req, res) => {
+  // apiRouter.js에서 id(url)를 가지고 video를 가지고옴
+  const { id } = req.params;
+  const video = await Video.findById(id);
+  if (!video) {
+    return res.status(404);
+  }
+  // Video.js - meta
+  video.meta.views = video.meta.views + 1;
+  await video.save();
+  return res.status(200);
+};
