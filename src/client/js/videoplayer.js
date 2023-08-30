@@ -164,7 +164,16 @@ const handleMuteClick = (e) => {
     // 2. 비디오 밖으로 나간다면 time out
     controlsTimeout = setTimeout(hideControls, 3000);
   };
+
+  // console.log(videoContainer.dataset)
   
+  const handleEnded = () => {
+    const { id } = videoContainer.dataset;
+    fetch(`/api/videos/${id}/view`, {
+      method: "POST",
+    });
+  };
+
 
 playBtn.addEventListener("click", handlePlayClick);
 muteBtn.addEventListener("click", handleMuteClick);
@@ -172,6 +181,8 @@ volumeRange.addEventListener("input", handleVolumeChange);
 video.addEventListener("loadeddata", handleLoadedMetadata);
 // 시간이 변경되는 걸 감지하는 evnet
 video.addEventListener("timeupdate", handleTimeUpdate);
+// 유저가 비디오 시청을 끝냈을 때 생기는 event
+video.addEventListener("ended", handleEnded);
 videoContainer.addEventListener("mousemove", handleMouseMove);
 videoContainer.addEventListener("mouseleave", handleMouseLeave);
 timeline.addEventListener("input", handleTimelineChange);
