@@ -166,7 +166,7 @@ const handleMuteClick = (e) => {
   };
 
   // console.log(videoContainer.dataset)
-  
+
   const handleEnded = () => {
     const { id } = videoContainer.dataset;
     fetch(`/api/videos/${id}/view`, {
@@ -178,7 +178,7 @@ const handleMuteClick = (e) => {
 playBtn.addEventListener("click", handlePlayClick);
 muteBtn.addEventListener("click", handleMuteClick);
 volumeRange.addEventListener("input", handleVolumeChange);
-video.addEventListener("loadeddata", handleLoadedMetadata);
+video.addEventListener("loadedmetadata", handleLoadedMetadata);
 // 시간이 변경되는 걸 감지하는 evnet
 video.addEventListener("timeupdate", handleTimeUpdate);
 // 유저가 비디오 시청을 끝냈을 때 생기는 event

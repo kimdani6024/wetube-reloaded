@@ -14,7 +14,8 @@ module.exports = {
     entry: {
         main: "./src/client/js/main.js",
         videoPlayer: "./src/client/js/videoPlayer.js",
-      },
+        recorder: "./src/client/js/recorder.js",
+    },
     // 결과물을 어떤 파일이름으로 어디에 저장할지도 지정해주기
     mode: 'development',
     // 명령어 실행 없이 계속 webpack실행
