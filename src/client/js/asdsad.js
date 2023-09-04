@@ -30,7 +30,6 @@ const handleDownload = async () => {
   // "-r", "60" : 초당 60프레임으로 인코딩
   await ffmpeg.run("-i", "recording.webm", "-r", "60", "output.mp4");
 
-  // ffmpeg.FS을 이용해서 mp4파일을 가져온다.
   const mp4File = ffmpeg.FS("readFile", "output.mp4");
 
   const mp4Blob = new Blob([mp4File.buffer], { type: "video/mp4" });

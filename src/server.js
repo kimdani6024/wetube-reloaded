@@ -24,6 +24,17 @@ const logger = morgan("dev")
 //express가 views 디렉토리에서 pug파일을 찾도록 설정
 app.set("view engine", "pug");
 app.set("views", process.cwd() + "/src/views");
+
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
+
+
 app.use(logger);
 //express가 form의 value들을 이해할 수 있도록 하고, 자바스크립트 형식으로 변형시켜줌
 app.use(express.urlencoded({ extended: true }));
@@ -65,10 +76,15 @@ app.use(localsMiddleware);
 app.use("/uploads", express.static("uploads"));
 // webpack.config.js에서 실행하면 만들어진 풀더 assets도 풀더를 노출시켜야함
 app.use("/static", express.static("assets"));
+
+
+  
 app.use("/", rootRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);
 app.use("/api", apiRouter);
+
+
 
 
 export default app;
