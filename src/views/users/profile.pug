@@ -5,7 +5,7 @@ block content
     //- User.js 모델에서 옴
     div.profile__data
         if user.avatarUrl
-            img(src="/" + user.avatarUrl).avatar
+            img.avatar(src= user.avatarUrl, crossorigin="use-credentials")
             h3=user.name
         else
             span 😀

@@ -7,6 +7,7 @@ import videoRouter from "./routers/videoRouter";
 import userRouter from "./routers/userRouter";
 import {localsMiddleware} from "./middlewares";
 import apiRouter from "./routers/apiRouter";
+import helmet from "helmet";
 
 //현재 작업 디렉토리
 // console.log(process.cwd())
@@ -26,13 +27,12 @@ app.set("view engine", "pug");
 app.set("views", process.cwd() + "/src/views");
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
+  res.header("Cross-Origin-Embedder-Policy", "credentialless");
+  res.header("Cross-Origin-Opener-Policy", "same-origin");
   next();
 });
+
+
 
 
 app.use(logger);
@@ -76,6 +76,7 @@ app.use(localsMiddleware);
 app.use("/uploads", express.static("uploads"));
 // webpack.config.js에서 실행하면 만들어진 풀더 assets도 풀더를 노출시켜야함
 app.use("/static", express.static("assets"));
+
 
 
   

@@ -5,10 +5,27 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 
 
-const startBtn = document.getElementById("startBtn");
+const actionBtn = document.getElementById("actionBtn");
 const video = document.getElementById("preview");
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
@@ -17,41 +34,80 @@ let stream;
 let recorder;
 let videoFile;
 
+const files = {
+  input: "recording.webm",
+  output: "output.mp4",
+  thumb: "thumbnail.jpg",
+};
 
-
-const handleDownload = async () => {
-  const ffmpeg = createFFmpeg({ log: true });
-  await ffmpeg.load();
-
-  // writeFile : 가상의 세계에 파일을 생성
-  ffmpeg.FS("writeFile", "recording.webm", await fetchFile(videoFile));
-
-  // ffmpeg.run : 가상컴퓨터에 이미 존재하는 파일을 input으로 받는것
-  // "-r", "60" : 초당 60프레임으로 인코딩
-  await ffmpeg.run("-i", "recording.webm", "-r", "60", "output.mp4");
-
-  const mp4File = ffmpeg.FS("readFile", "output.mp4");
-
-  const mp4Blob = new Blob([mp4File.buffer], { type: "video/mp4" });
-
-  const mp4Url = URL.createObjectURL(mp4Blob);
-
+const downloadFile = (fileUrl, fileName) => {
   const a = document.createElement("a");
-
-  a.href = mp4Url;
-  // url을 저장하게 해준다
-  a.download = "MyRecording.mp4";
+  a.href = fileUrl;
+  a.download = fileName;
   document.body.appendChild(a);
   a.click();
 };
 
 
-const handleStop = () => {
-  startBtn.innerText = "Download Recording";
-  startBtn.removeEventListener("click", handleStop);
-  startBtn.addEventListener("click", handleDownload);
-  recorder.stop();
+
+const handleDownload = async () => {
+  actionBtn.removeEventListener("click", handleDownload);
+
+  actionBtn.innerText = "Transcoding...";
+
+  actionBtn.disabled = true;
+
+  const ffmpeg = createFFmpeg({ log: true });
+  await ffmpeg.load();
+
+  // writeFile : 가상의 세계에 파일을 생성
+  ffmpeg.FS("writeFile", files.input, await fetchFile(videoFile));
+
+  // ffmpeg.run : 가상컴퓨터에 이미 존재하는 파일을 input으로 받는것
+  // "-r", "60" : 초당 60프레임으로 인코딩
+  await ffmpeg.run("-i", files.input, "-r", "60", files.output);
+
+  await ffmpeg.run(
+    "-i",
+    files.input,
+    "-ss",
+    "00:00:01",
+    "-frames:v",
+    "1",
+    files.thumb
+  );
+
+
+
+  // ffmpeg.FS을 이용해서 mp4파일을 가져온다.
+  const mp4File = ffmpeg.FS("readFile", files.output);
+  const thumbFile = ffmpeg.FS("readFile", files.thumb);
+
+  // 실제파일 만들기
+  // Blob : 배열안에 배열들을 받을 수 있음. 배열을 만들고 그 안에 buffer를 넣어주기
+  // 자바스트립트에게 type: "video/mp4" 알려주기
+  const mp4Blob = new Blob([mp4File.buffer], { type: "video/mp4" });
+
+  const thumbBlob = new Blob([thumbFile.buffer], { type: "image/jpg" });
+
+  const mp4Url = URL.createObjectURL(mp4Blob);
+
+  const thumbUrl = URL.createObjectURL(thumbBlob);
+
+  ffmpeg.FS("unlink", files.input);
+  ffmpeg.FS("unlink", files.output);
+  ffmpeg.FS("unlink", files.thumb);
+
+  URL.revokeObjectURL(mp4Url);
+  URL.revokeObjectURL(thumbUrl);
+  URL.revokeObjectURL(videoFile);
+
+  actionBtn.disabled = false;
+  actionBtn.innerText = "Record Again";
+  actionBtn.addEventListener("click", handleStart);
 };
+
+
 
 /*
     const handleStart = () => {
@@ -83,11 +139,13 @@ const handleStop = () => {
     };*/
 
 const handleStart = () => {
+  
   // start recording을 누르면 stop recording이 뜨고 eventlistener 제거
-  startBtn.innerText = "Stop Recording";
-  startBtn.removeEventListener("click", handleStart);
+  actionBtn.innerText = "Recording";
+  actionBtn.disabled = true;
+  actionBtn.removeEventListener("click", handleStart);
   // 그리고 새로운 걸 추가해줌. 오래된 것을 제거했던것
-  startBtn.addEventListener("click", handleStop);
+
   recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
   // ondataavailable : 녹화가 멈추면 발생
   // handleStop에서 recorder.stop(); 녹화 종료 후
@@ -95,13 +153,20 @@ const handleStart = () => {
     // url : 파일을 가르킴
     // createObjectURL : 녹화를 종료하면 영상의 모든 정보를 가진 object url이 만들어짐
     // url을 통해 파일을 참조 할 수 있음
+    // event.data도 blob임
     videoFile = URL.createObjectURL(event.data);
     video.srcObject = null;
     video.src = videoFile;
     video.loop = true;
     video.play();
+    actionBtn.innerText = "Download";
+    actionBtn.disabled = false;
+    actionBtn.addEventListener("click", handleDownload);
   };
   recorder.start();
+  setTimeout(() => {
+    recorder.stop();
+  }, 5000);
 };
 
 // 시작
@@ -110,7 +175,10 @@ const init = async () => {
   // stream : 어딘가에 넣어둘 0과 1로 이루어진 데이터
   stream = await navigator.mediaDevices.getUserMedia({
     audio: false,
-    video: true,
+    video: {
+      width: 1024,
+      height: 576,
+    },
   });
   video.srcObject = stream;
   video.play();
@@ -118,4 +186,21 @@ const init = async () => {
 
 init();
 
-startBtn.addEventListener("click", handleStart);
+actionBtn.addEventListener("click", handleStart);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

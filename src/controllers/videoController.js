@@ -130,7 +130,8 @@ export const postUpload = async (req, res) => {
   } = req.session;
   // multer는 req.file을 제공해줌. file안에 path가 있음
   // fileUrl만들어주기 > video.js에서
-  const { path: fileUrl } = req.file;
+  const { video, thumb } = req.files;
+  console.log(video, thumb);
   //video.js참고
   const { title, description, hashtags } = req.body;
   //왼쪽 title 등은 schema의 것
@@ -140,7 +141,8 @@ export const postUpload = async (req, res) => {
     // newVideo id를 User의 videos array에 추가
     const newVideo = await Video.create({
       title,
-      fileUrl,
+      fileUrl: video[0].path,
+      thumbUrl: thumb[0].path.replace(/[\\]/g, "/"),
       description,
       // 영상의 소유주인 현재 로그인중인 유저의 id를 쓰겠다는뜻임.
       owner: _id,

@@ -7,7 +7,8 @@ const videoSchema = new mongoose.Schema({
   //trim:공백을 없애줌
   title: { type: String, required: true, trim: true, maxLength: 80 },
   fileUrl: { type: String, required: true },
-  description: { type: String, required: true, trim: true},
+  thumbUrl: { type: String, required: true },
+  description: { type: String, required: true, trim: true, minLength: 2 },
   //default: Date.now는 즉각 실행하지만 mongoose가 내가 새로운 비디오를 생성했을 때만 실행시켜줌
   createdAt: { type: Date, required: true, default: Date.now },
   hashtags: [{ type: String, trim: true }],
@@ -42,6 +43,9 @@ videoSchema.static("formatHashtags", function (hashtags) {
     .map((word) => (word.startsWith("#") ? word : `#${word}`));
 });
 
+videoSchema.static("changePathFormula", (urlPath) => {
+  return urlPath.replace(/\\/g, "/");
+  });
 
 // model이름+ 데이터형태인 schema로 구성
 const Video = mongoose.model("Video", videoSchema);
