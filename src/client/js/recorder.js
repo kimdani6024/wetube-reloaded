@@ -30,12 +30,33 @@ const handleDownload = async () => {
   // "-r", "60" : 초당 60프레임으로 인코딩
   await ffmpeg.run("-i", "recording.webm", "-r", "60", "output.mp4");
 
+  await ffmpeg.run(
+    "-i",
+    "recording.webm",
+    "-ss",
+    "00:00:01",
+    "-frames:v",
+    "1",
+    "thumbnail.jpg"
+  );
+
+
+
   // ffmpeg.FS을 이용해서 mp4파일을 가져온다.
   const mp4File = ffmpeg.FS("readFile", "output.mp4");
 
+  const thumbFile = ffmpeg.FS("readFile", "thumbnail.jpg");
+
+  // 실제파일 만들기
+  // Blob : 배열안에 배열들을 받을 수 있음. 배열을 만들고 그 안에 buffer를 넣어주기
+  // 자바스트립트에게 type: "video/mp4" 알려주기
   const mp4Blob = new Blob([mp4File.buffer], { type: "video/mp4" });
 
+  const thumbBlob = new Blob([thumbFile.buffer], { type: "image/jpg" });
+
   const mp4Url = URL.createObjectURL(mp4Blob);
+
+  const thumbUrl = URL.createObjectURL(thumbBlob);
 
   const a = document.createElement("a");
 
@@ -44,6 +65,20 @@ const handleDownload = async () => {
   a.download = "MyRecording.mp4";
   document.body.appendChild(a);
   a.click();
+
+  const thumbA = document.createElement("a");
+  thumbA.href = thumbUrl;
+  thumbA.download = "MyThumbnail.jpg";
+  document.body.appendChild(thumbA);
+  thumbA.click();
+
+  ffmpeg.FS("unlink", "recording.webm");
+  ffmpeg.FS("unlink", "output.mp4");
+  ffmpeg.FS("unlink", "thumbnail.jpg");
+
+  URL.revokeObjectURL(mp4Url);
+  URL.revokeObjectURL(thumbUrl);
+  URL.revokeObjectURL(videoFile);
 };
 
 
@@ -96,6 +131,7 @@ const handleStart = () => {
     // url : 파일을 가르킴
     // createObjectURL : 녹화를 종료하면 영상의 모든 정보를 가진 object url이 만들어짐
     // url을 통해 파일을 참조 할 수 있음
+    // event.data도 blob임
     videoFile = URL.createObjectURL(event.data);
     video.srcObject = null;
     video.src = videoFile;
