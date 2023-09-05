@@ -10,6 +10,7 @@ block content
     
     //- https://developer.mozilla.org/ko/docs/Learn/HTML/Howto/Use_data_attributes
     //- data-로 시작하는 이름으로 어떤 데이터든지 저장할 수 있음
+
     div#videoContainer(data-id=video._id)
         video(src="/" + video.fileUrl)
         div#videoControls.videoControls
@@ -36,24 +37,31 @@ block content
             br
         small.video__createdAt=new Date(video.createdAt).toLocaleDateString("ko-kr", {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})
         br
+        //- 영상 owner의 id와 로그인된 사람의 id가 일치하면 로그인된 사용자가 이 영상의 주인
+        //- 로그인된 사람의 id는 미들웨어에서 알려줌 res.locals.loggedInUser = req.session.user || {};
         if String(video.owner._id) === String(loggedInUser._id)
             a(href=`${video.id}/edit`) Edit Video &rarr;
-            a(href=`${video.id}/delete`) Delete Video &rarr;      
-
+            a(href=`${video.id}/delete`) Delete Video &rarr; 
     
-        //- div
-        //-     p=video.description
-        //-     small=video.createdAt
-        //- div
-        //-     small Uploaded by 
-        //-         a(href=`/users/${video.owner._id}`)=video.owner.name
-        //-         //- 영상 owner의 id와 로그인된 사람의 id가 일치하면 로그인된 사용자가 이 영상의 주인
-        //-         //- 로그인된 사람의 id는 미들웨어에서 알려줌 res.locals.loggedInUser = req.session.user || {};
-        //- if String(video.owner._id) === String(loggedInUser._id)
-        //-     a(href=`${video.id}/edit`) Edit Video &rarr;
-        //-     br
-        //-     a(href=`${video.id}/delete`) Delete Video &rarr;
+    if loggedIn
+        div.video__add-comments
+            form.video__comment-form#commentForm
+                textarea(cols="30", rows="10", placeholder="Write a nice commment...")
+                button Add Comment   
+
+    div.video__comments
+        ul
+            each comment in video.comments.reverse()
+                li.video__comment(data-id=comment.id)
+                    i.fas.fa-comment
+                    span  #{comment.text}
+                    span ❌
+
+
+
 block scripts
     //- static url로 가면, 유저에게 assets 풀더를 접근할 수 있는 권한을 준다
     //- server.js app.use("/static", express.static("assets"));
-    script(src="/static/js/videoPlayer.js") 
+    script(src="/static/js/videoPlayer.js")
+    if loggedIn
+        script(src="/static/js/commentSection.js") 

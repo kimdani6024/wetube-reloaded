@@ -1,5 +1,6 @@
 import Video from "../models/Video";
 import User from "../models/User";
+import Comment from "../models/Comment";
 
 //view name 쓰기 home
 //res.render로 home.pug를 렌더링
@@ -41,13 +42,14 @@ export const home = async (req, res) => {
 export const watch = async (req, res) => {  // videoRouter.get("/:id(\\d+)", see);에서 id얻음
   // const id = req.params.id;
   const { id } = req.params;
-  //findById는 id로 영상을 찾아낼 수 있는 기능을 지원해줌
+  // findById는 id로 영상을 찾아낼 수 있는 기능을 지원해줌
   // const video = await Video.findById(id);
   // const owner = await User.findById(video.owner);
   // 몽구스는 objectID가 User에서 오는 걸 암
   // populate를 하지 않으면 그저 string값만 가짐 
   // populate를 하면 User 객체 전체를 값으로 가짐 > owner : objectid > 이 id가 user에서 옴
-  const video = await Video.findById(id).populate("owner");
+  const video = await Video.findById(id).populate("owner").populate("comments");
+  console.log(video);
 
   if (!video) {
     return res.render("404", { pageTitle: "Video not found." });
@@ -234,3 +236,28 @@ export const registerView = async (req, res) => {
   await video.save();
   return res.sendStatus(200);
 };
+
+// server.js, videocontroller.js, apirouter.js, commentsection.js
+export const createComment = async (req, res) => {
+  const {
+    session: { user },
+    body: { text },
+    params: { id },
+  } = req;
+  const video = await Video.findById(id);
+  if (!video) {
+    return res.sendStatus(404);
+  }
+  const comment = await Comment.create({
+    text,
+    owner: user._id,
+    video: id,
+  });
+  video.comments.push(comment._id);
+  video.save();
+  return res.status(201).json({ newCommentId: comment._id });
+};
+
+
+
+

@@ -9,15 +9,14 @@ const videoSchema = new mongoose.Schema({
   fileUrl: { type: String, required: true },
   thumbUrl: { type: String, required: true },
   description: { type: String, required: true, trim: true, minLength: 2 },
-  //default: Date.now는 즉각 실행하지만 mongoose가 내가 새로운 비디오를 생성했을 때만 실행시켜줌
   createdAt: { type: Date, required: true, default: Date.now },
   hashtags: [{ type: String, trim: true }],
   meta: {
     views: { type: Number, default: 0, required: true },
+  },
   comments: [
     { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Comment" },
   ],
-  },
   // video와 user를 연결시키기 위해서 db에서 db.users.remove({}), db.videos.remove({})해주기  
   // user : 해당 user가 업로드한 모든 영상의 id를 저장해줌
   // video : 해당 영상을 올린 user의 id를 저장해줌
@@ -26,8 +25,10 @@ const videoSchema = new mongoose.Schema({
   // mongoose에게 owner가 어떤 model의 objectld라고 알려줄거임. 
   // user.js const User = mongoose.model("User", userSchema);
   // 1개의 영상은 소유주가 1명이지만, 소유주는 여러 영상을 소유할 수 있어서 array임
+
   owner: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
 });
+
 
 // export const formatHashtags = (hashtags) =>
 //   hashtags.split(",").map((word) => (word.startsWith("#") ? word : `#${word}`));

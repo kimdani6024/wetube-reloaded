@@ -8,13 +8,16 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 // webpack이 읽을 configuration 파일을 내보냄
 const path = require("path")
 
+const BASE_JS = "./src/client/js/";
+
 module.exports = {
     // 소스코드. 우리가 변경하고자 하는 파일 경로를 입력함
     // 시작코드
     entry: {
-        main: "./src/client/js/main.js",
-        videoPlayer: "./src/client/js/videoPlayer.js",
-        recorder: "./src/client/js/recorder.js",
+        main: BASE_JS + "main.js",
+        videoPlayer: BASE_JS + "videoPlayer.js",
+        recorder: BASE_JS + "recorder.js",
+        commentSection: BASE_JS + "commentSection.js",
     },
     // 결과물을 어떤 파일이름으로 어디에 저장할지도 지정해주기
     mode: 'development',
