@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String },
   name: { type: String, required: true },
   location: String,
+  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
   // 1개의 영상은 소유주가 1명이지만, 소유주는 여러 영상을 소유할 수 있어서 []array임
   videos: [{ type: mongoose.Schema.Types.ObjectId, ref: "Video" }],
 });

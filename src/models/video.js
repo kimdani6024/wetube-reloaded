@@ -14,6 +14,9 @@ const videoSchema = new mongoose.Schema({
   hashtags: [{ type: String, trim: true }],
   meta: {
     views: { type: Number, default: 0, required: true },
+  comments: [
+    { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Comment" },
+  ],
   },
   // video와 user를 연결시키기 위해서 db에서 db.users.remove({}), db.videos.remove({})해주기  
   // user : 해당 user가 업로드한 모든 영상의 id를 저장해줌
