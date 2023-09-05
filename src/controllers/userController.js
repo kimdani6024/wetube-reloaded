@@ -281,6 +281,7 @@ export const postEdit = async (req, res) => {
 export const getChangePassword = (req, res) => {
   // 깃허브 사용자 : 비밀번호가 없어서 비밀번호 변경 불가
   if (req.session.user.socialOnly === true) {
+    req.flash("error", "Can't change password.");
     return res.redirect("/");
   }
   return res.render("users/change-password", { pageTitle: "Change Password" });
@@ -315,6 +316,7 @@ export const postChangePassword = async (req, res) => {
   // 비밀번호 저장은 user.js에서 함
   // save()가 실행될때마다 hash가 일어남 > user.js
   await user.save();
+  req.flash("info", "Password updated");
   // 비밀번호 바꾸면 로그아웃됌
   return res.redirect("/users/logout");
 };

@@ -76,6 +76,7 @@ export const getEdit = async (req, res) => {
   // 자바스크립트에선 데이터형식도 비교하기때문에 string을 입혀줘서 비교하자
   // watch.pug도 같음
   if (String(video.owner) !== String(_id)) {
+    req.flash("error", "Not authorized");
     return res.status(403).redirect("/");
   }
   //video가 존재한다면
@@ -104,6 +105,7 @@ export const postEdit = async (req, res) => {
     return res.status(404).render("404", { pageTitle: "Video not found." });
   }
   if (String(video.owner) !== String(_id)) {
+    req.flash("error", "You are not the the owner of the video.");
     return res.status(403).redirect("/");
   }
   //영상 정보 업데이트
@@ -113,6 +115,7 @@ export const postEdit = async (req, res) => {
     description,
     hashtags: Video.formatHashtags(hashtags),
   });
+  req.flash("success", "Changes saved.");
   //videoRouter.route("/:id([0-9a-f]{24})/edit").get(getEdit).post(postEdit);
   return res.redirect(`/videos/${id}`);
 };
@@ -131,7 +134,7 @@ export const postUpload = async (req, res) => {
   // multer는 req.file을 제공해줌. file안에 path가 있음
   // fileUrl만들어주기 > video.js에서
   const { video, thumb } = req.files;
-  console.log(video, thumb);
+  // console.log(video, thumb);
   //video.js참고
   const { title, description, hashtags } = req.body;
   //왼쪽 title 등은 schema의 것

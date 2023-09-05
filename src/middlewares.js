@@ -23,6 +23,7 @@ export const protectorMiddleware = (req, res, next) => {
     if (req.session.loggedIn) {
       return next();
     } else {
+      req.flash("error", "Log in first.");
     // 사용자가 로그인이 안되있으면, 로그인페이지로 가게 만듬
       return res.redirect("/login");
     }
@@ -34,6 +35,7 @@ export const protectorMiddleware = (req, res, next) => {
     if (!req.session.loggedIn) {
       return next();
     } else {
+      req.flash("error", "Not authorized");
     // 로그인이 되어 있으면 홈으로 가게 만듬
       return res.redirect("/");
     }
