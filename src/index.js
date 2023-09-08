@@ -1,6 +1,6 @@
 import express from "express";
 
-const PORT = 4000;
+const PORT = 3000;
 const app = express();
 
 const URLLogger = (req,res,next) => {

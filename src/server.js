@@ -35,7 +35,6 @@ app.use((req, res, next) => {
 
 
 
-
 app.use(logger);
 //express가 form의 value들을 이해할 수 있도록 하고, 자바스크립트 형식으로 변형시켜줌
 app.use(express.urlencoded({ extended: true }));

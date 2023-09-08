@@ -20,9 +20,9 @@ module.exports = {
         commentSection: BASE_JS + "commentSection.js",
     },
     // 결과물을 어떤 파일이름으로 어디에 저장할지도 지정해주기
-    mode: 'development',
-    // 명령어 실행 없이 계속 webpack실행
-    watch: true,
+    // mode: 'development',
+    // // 명령어 실행 없이 계속 webpack실행
+    // watch: true,
     plugins: [
         new MiniCssExtractPlugin({
             // 이 파일은 output 디렉토리로 향하게 됌
