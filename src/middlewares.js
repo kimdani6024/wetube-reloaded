@@ -1,4 +1,26 @@
 import multer from "multer";
+import aws from "aws-sdk";
+import multerS3 from "multer-s3";
+
+const s3 = new aws.S3({
+  region: "ap-northeast-2",
+  accessKeyId: process.env.AWS_ID,
+  secretAccessKey: process.env.AWS_SECRET,
+  });
+
+
+const s3ImageUploader = multerS3({
+  s3: s3,
+  bucket: "daniwetube/images",
+  acl: "public-read",
+});
+
+const s3VideoUploader = multerS3({
+  s3: s3,
+  bucket: "daniwetube/videos",
+  acl: "public-read",
+});
+
 
 //lovals에 로그인한 사용자를 추가
 //우리의 pug이 누가 로그인 했는지 알 수 있음
@@ -50,10 +72,12 @@ export const protectorMiddleware = (req, res, next) => {
       // 용량 : byte기준임
       fileSize: 3000000,
     },
+    storage: s3ImageUploader,
   });
   export const videoUpload = multer({
     dest: "uploads/videos/",
     limits: {
       fileSize: 10000000,
     },
+    storage: s3VideoUploader,
   });

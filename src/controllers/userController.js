@@ -254,7 +254,7 @@ export const postEdit = async (req, res) => {
       {
         // 유저가 form으로 파일을 보냈다면 file.path를 쓰고 아니면 기존 avatarUrl를 쓴다.
         // form에 파일이 있다면 req에 있는 file object를 사용할 수 있다는 것 -> file.path가 존재한다는 것 
-        avatarUrl: file ? file.path : avatarUrl,
+        avatarUrl: file ? file.location : avatarUrl,
         name,
         email,
         username,

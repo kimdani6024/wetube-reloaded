@@ -146,8 +146,8 @@ export const postUpload = async (req, res) => {
     // newVideo id를 User의 videos array에 추가
     const newVideo = await Video.create({
       title,
-      fileUrl: video[0].path,
-      thumbUrl: thumb[0].path.replace(/[\\]/g, "/"),
+      fileUrl: video[0].location,
+      thumbUrl: thumb[0].location.replace(/[\\]/g, "/"),
       description,
       // 영상의 소유주인 현재 로그인중인 유저의 id를 쓰겠다는뜻임.
       owner: _id,
