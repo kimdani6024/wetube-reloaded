@@ -1,5 +1,7 @@
 # Wetube Reloaded
 
+https://daniwetube.fly.dev
+
 / -> Home
 /join -> Join
 /login -> Login
